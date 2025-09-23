@@ -2,6 +2,10 @@
   "compilerOptions": {
     "target": "ESNext",
     "baseUrl": ".",
+    "paths": {
+      "tweeter-shared": ["../tweeter-shared/src"],
+      "tweeter-shared/*": ["../tweeter-shared/src/*"]
+    },
     "lib": [
       "dom",
       "dom.iterable",
@@ -9,7 +13,7 @@
     ],
     "types": ["vite/client", "vite-plugin-svgr/client"],
     "allowJs": true,
-    "skipLibCheck": false,
+  "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
@@ -25,8 +29,5 @@
   "include": [
     "src"
   ],
-  "paths": {
-    "tweeter-shared": ["../tweeter-shared/src"],
-    "tweeter-shared/*": ["../tweeter-shared/src/*"]
-  }
+  
 }

@@ -6,8 +6,6 @@ import {
   UserInfoActionsContext,
 } from "../userInfo/UserInfoContexts";
 import { AuthToken, FakeData, Status, User } from "tweeter-shared";
-import { useState, useEffect } from "react";
-import InfiniteScroll from "react-infinite-scroll-component";
 import { ToastActionsContext } from "../toaster/ToastContexts";
 import { useNavigate, useParams } from "react-router-dom";
 import { ToastType } from "../toaster/Toast";
@@ -19,9 +17,10 @@ interface Props {
 
 const StatusItem = (props: Props) => {
 
-
+  const navigate = useNavigate();
   const { displayToast } = useContext(ToastActionsContext);
-
+  const { setDisplayedUser } = useContext(UserInfoActionsContext);
+  const { displayedUser, authToken } = useContext(UserInfoContext);
   const extractAlias = (value: string): string => {
     const index = value.indexOf("@");
     return value.substring(index);
@@ -77,7 +76,7 @@ const StatusItem = (props: Props) => {
               </b>{" "}
               -{" "}
               <Link
-                to={`/feed/${props.item.user.alias}`}
+                to={`/${props.page}/${props.item.user.alias}`}
                 onClick={navigateToUser}
               >
                 {props.item.user.alias}
@@ -85,7 +84,7 @@ const StatusItem = (props: Props) => {
             </h2>
             {props.item.formattedDate}
             <br />
-            <Post status={props.item} featurePath="/feed" />
+            <Post status={props.item} featurePath={`/${props.page}`} />
           </div>
         </div>
       </div>
