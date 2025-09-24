@@ -1,12 +1,12 @@
 import { KeyboardEventHandler, useState } from "react";
 
 interface Props {
-  onEnter: KeyboardEventHandler;
+  onEnter: KeyboardEventHandler,
+    setAlias: Function,
+    setPassword: Function
 }
 
 const AuthenticationFields = (props: Props) => {
-  const [alias, setAlias] = useState("");
-  const [password, setPassword] = useState("");
 
   return (
     <div>
@@ -18,7 +18,7 @@ const AuthenticationFields = (props: Props) => {
           id="aliasInput"
           placeholder="name@example.com"
           onKeyDown={props.onEnter}
-          onChange={(event) => setAlias(event.target.value)}
+          onChange={(event) => props.setAlias(event.target.value)}
         />
         <label htmlFor="aliasInput">Alias</label>
   </div>
@@ -29,7 +29,7 @@ const AuthenticationFields = (props: Props) => {
           id="passwordInput"
           placeholder="Password"
           onKeyDown={props.onEnter}
-          onChange={(event) => setPassword(event.target.value)}
+          onChange={(event) => props.setPassword(event.target.value)}
         />
         <label htmlFor="passwordInput">Password</label>
       </div>

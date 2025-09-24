@@ -160,7 +160,7 @@ const Register = () => {
           <label htmlFor="lastNameInput">Last Name</label>
         </div>
         <div className="form-floating">
-          <AuthenticationFields onEnter={registerOnEnter}/>
+          <AuthenticationFields onEnter={registerOnEnter} setAlias={setAlias} setPassword={setPassword}/>
         </div>
         <div className="form-floating mb-3">
           <input
