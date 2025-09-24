@@ -9,7 +9,7 @@ import { AuthToken, FakeData, User } from "tweeter-shared";
 import { ToastActionsContext } from "../../toaster/ToastContexts";
 import { Buffer } from "buffer";
 import { ToastType } from "../../toaster/Toast";
-import AuthFields from "../AuthFields";
+import AuthenticationFields from "../AuthFields";
 
 const Register = () => {
   const [firstName, setFirstName] = useState("");
@@ -160,7 +160,7 @@ const Register = () => {
           <label htmlFor="lastNameInput">Last Name</label>
         </div>
         <div className="form-floating">
-          <AuthFields onEnter={registerOnEnter}/>
+          <AuthenticationFields onEnter={registerOnEnter}/>
         </div>
         <div className="form-floating mb-3">
           <input

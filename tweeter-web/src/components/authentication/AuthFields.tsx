@@ -4,7 +4,7 @@ interface Props {
   onEnter: KeyboardEventHandler;
 }
 
-const AuthFields = (props: Props) => {
+const AuthenticationFields = (props: Props) => {
   const [alias, setAlias] = useState("");
   const [password, setPassword] = useState("");
 
@@ -37,4 +37,4 @@ const AuthFields = (props: Props) => {
   );
 };
 
-export default AuthFields;
+export default AuthenticationFields;

@@ -3,6 +3,7 @@ import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { useContext } from "react";
 import { ToastActionsContext } from "../toaster/ToastContexts";
 import { ToastType } from "../toaster/Toast";
+import OAuth from "./OAuth";
 
 interface Props {
   headingText: string;
@@ -48,90 +49,17 @@ const AuthenticationFormLayout = (props: Props) => {
           <h1 className="h5 mb-3 fw-normal">{props.oAuthHeading}</h1>
 
           <div className="text-center mb-3">
-            <button
-              type="button"
-              className="btn btn-link btn-floating mx-1"
-              onClick={() =>
-                displayInfoMessageWithDarkBackground(
-                  "Google registration is not implemented."
-                )
-              }
-            >
-              <OverlayTrigger
-                placement="top"
-                overlay={<Tooltip id="googleTooltip">Google</Tooltip>}
-              >
-                <FontAwesomeIcon icon={["fab", "google"]} />
-              </OverlayTrigger>
-            </button>
 
-            <button
-              type="button"
-              className="btn btn-link btn-floating mx-1"
-              onClick={() =>
-                displayInfoMessageWithDarkBackground(
-                  "Facebook registration is not implemented."
-                )
-              }
-            >
-              <OverlayTrigger
-                placement="top"
-                overlay={<Tooltip id="facebookTooltip">Facebook</Tooltip>}
-              >
-                <FontAwesomeIcon icon={["fab", "facebook"]} />
-              </OverlayTrigger>
-            </button>
+            <OAuth oauthLower="google" oauthUpper="Google" tooltip="googleTooltip"/>
 
-            <button
-              type="button"
-              className="btn btn-link btn-floating mx-1"
-              onClick={() =>
-                displayInfoMessageWithDarkBackground(
-                  "Twitter registration is not implemented."
-                )
-              }
-            >
-              <OverlayTrigger
-                placement="top"
-                overlay={<Tooltip id="twitterTooltip">Twitter</Tooltip>}
-              >
-                <FontAwesomeIcon icon={["fab", "twitter"]} />
-              </OverlayTrigger>
-            </button>
+            <OAuth oauthLower="facebook" oauthUpper="Facebook" tooltip="facebookTooltip"/>
 
-            <button
-              type="button"
-              className="btn btn-link btn-floating mx-1"
-              onClick={() =>
-                displayInfoMessageWithDarkBackground(
-                  "LinkedIn registration is not implemented."
-                )
-              }
-            >
-              <OverlayTrigger
-                placement="top"
-                overlay={<Tooltip id="linkedInTooltip">LinkedIn</Tooltip>}
-              >
-                <FontAwesomeIcon icon={["fab", "linkedin"]} />
-              </OverlayTrigger>
-            </button>
+            <OAuth oauthLower="twitter" oauthUpper="Twitter" tooltip="twitterTooltip"/>
 
-            <button
-              type="button"
-              className="btn btn-link btn-floating mx-1"
-              onClick={() =>
-                displayInfoMessageWithDarkBackground(
-                  "Github registration is not implemented."
-                )
-              }
-            >
-              <OverlayTrigger
-                placement="top"
-                overlay={<Tooltip id="githubTooltip">GitHub</Tooltip>}
-              >
-                <FontAwesomeIcon icon={["fab", "github"]} />
-              </OverlayTrigger>
-            </button>
+            <OAuth oauthLower="linkedin" oauthUpper="LinkedIn" tooltip="linkedInTooltip"/>
+
+            <OAuth oauthLower="github" oauthUpper="Github" tooltip="githubTooltip"/>
+
           </div>
 
           <div className="checkbox mb-3">

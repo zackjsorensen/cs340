@@ -8,7 +8,7 @@ import AuthenticationFormLayout from "../AuthenticationFormLayout";
 import { AuthToken, FakeData, User } from "tweeter-shared";
 import { ToastActionsContext } from "../../toaster/ToastContexts";
 import { ToastType } from "../../toaster/Toast";
-import AuthFields from "../AuthFields";
+import AuthenticationFields from "../AuthFields";
 
 interface Props {
   originalUrl?: string;
@@ -75,7 +75,7 @@ const Login = (props: Props) => {
   const inputFieldFactory = () => {
     return (
       <>
-       <AuthFields onEnter={loginOnEnter}/>
+       <AuthenticationFields onEnter={loginOnEnter}/>
       </>
     );
   };
