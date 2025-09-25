@@ -1,9 +1,7 @@
 import { propTypes } from "react-bootstrap/esm/Image";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { FontAwesomeIcon, FontAwesomeIconProps } from "@fortawesome/react-fontawesome";
-import { ToastType } from "../toaster/Toast";
-import { useContext } from "react";
-import { ToastActionsContext } from "../toaster/ToastContexts";
+import { useMessageActions } from "../toaster/MessageHooks";
 
 interface Props {
   tooltip: string,
@@ -15,14 +13,12 @@ interface Props {
 const OAuth = (props: Props) => {
 
     
-  const { displayToast } = useContext(ToastActionsContext);
+  const { displayInfoMessage } = useMessageActions();
 
   const displayInfoMessageWithDarkBackground = (message: string): void => {
-    displayToast(
-      ToastType.Info,
+    displayInfoMessage(
       message,
       3000,
-      undefined,
       "text-white bg-primary"
     );
   };
