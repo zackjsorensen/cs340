@@ -1,6 +1,4 @@
 import "./App.css";
-import { useContext } from "react";
-import { UserInfoContext } from "./components/userInfo/UserInfoContexts";
 import {
   BrowserRouter,
   Navigate,
@@ -13,11 +11,15 @@ import Register from "./components/authentication/register/Register";
 import MainLayout from "./components/mainLayout/MainLayout";
 import Toaster from "./components/toaster/Toaster";
 import UserItemScroller from "./components/mainLayout/UserItemScroller";
-import { AuthToken, User, FakeData, Status } from "tweeter-shared";
+import { AuthToken, FakeData, Status } from "tweeter-shared";
 import StatusItemScroller from "./components/mainLayout/StatusItemScroller";
+import { useUserInfo } from "./components/userInfo/UserInfoHooks";
+import { UserItemView } from "./presenter/UserItemPresenter";
+import { FolloweePresenter } from "./presenter/FolloweePresenter";
+import { FollowerPresenter } from "./presenter/FollowerPresenter";
 
 const App = () => {
-  const { currentUser, authToken } = useContext(UserInfoContext);
+  const { currentUser, authToken } = useUserInfo();
 
   const isAuthenticated = (): boolean => {
     return !!currentUser && !!authToken;
@@ -38,27 +40,9 @@ const App = () => {
 };
 
 const AuthenticatedRoutes = () => {
-  const { displayedUser } = useContext(UserInfoContext);
+  const { displayedUser } = useUserInfo();
 
-  const loadMoreFollowees = async (
-    authToken: AuthToken,
-    userAlias: string,
-    pageSize: number,
-    lastItem: User | null
-  ): Promise<[User[], boolean]> => {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getPageOfUsers(lastItem, pageSize, userAlias);
-  };
-
-  const loadMoreFollowers = async (
-    authToken: AuthToken,
-    userAlias: string,
-    pageSize: number,
-    lastItem: User | null
-  ): Promise<[User[], boolean]> => {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getPageOfUsers(lastItem, pageSize, userAlias);
-  };
+  
 
   const loadMoreFeedItems = async (
     authToken: AuthToken,
@@ -101,20 +85,20 @@ const AuthenticatedRoutes = () => {
           path="story/:displayedUser"
           element={
             <StatusItemScroller
-            key={`story-${displayedUser!.alias}`}
+              key={`story-${displayedUser!.alias}`}
               pageDescription="story"
               loadMore={loadMoreStoryItems}
             />
           }
         />
-        <Route 
+        <Route
           path="followees/:displayedUser"
           element={
             <UserItemScroller
               key={`followees-${displayedUser!.alias}`} // unique key so react rerenders rather than treating these as the same component
-              itemDescription="Followees"
               featureUrl="/followees"
-              loadMore={loadMoreFollowees}
+              presenterFactory={(view: UserItemView) => new FolloweePresenter(view)}
+
             />
           }
         />
@@ -123,9 +107,8 @@ const AuthenticatedRoutes = () => {
           element={
             <UserItemScroller
               key={`followers-${displayedUser!.alias}`}
-              itemDescription="Followers"
               featureUrl="/followers"
-              loadMore={loadMoreFollowers}
+              presenterFactory={(view: UserItemView) => new FollowerPresenter(view)}
             />
           }
         />

@@ -1,24 +1,21 @@
 import "./AppNavbar.css";
-import { useContext } from "react";
-import {
-  UserInfoContext,
-  UserInfoActionsContext,
-} from "../userInfo/UserInfoContexts";
 import { Container, Nav, Navbar } from "react-bootstrap";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import Image from "react-bootstrap/Image";
 import { AuthToken } from "tweeter-shared";
 import { useMessageActions } from "../toaster/MessageHooks";
+import { useUserInfo, useUserInfoActions } from "../userInfo/UserInfoHooks";
 
 const AppNavbar = () => {
   const location = useLocation();
-  const { authToken, displayedUser } = useContext(UserInfoContext);
-  const { clearUserInfo } = useContext(UserInfoActionsContext);
+  const { authToken, displayedUser } = useUserInfo();
+  const { clearUserInfo } = useUserInfoActions();
   const navigate = useNavigate();
-  const { displayInfoMessage, displayErrorMessage, deleteMessage } = useMessageActions();
+  const { displayInfoMessage, displayErrorMessage, deleteMessage } =
+    useMessageActions();
 
   const logOut = async () => {
-    const loggingOutToastId = displayInfoMessage( "Logging Out...", 0);
+    const loggingOutToastId = displayInfoMessage("Logging Out...", 0);
 
     try {
       await logout(authToken!);
@@ -28,7 +25,7 @@ const AppNavbar = () => {
       navigate("/login");
     } catch (error) {
       displayErrorMessage(
-        `Failed to log user out because of exception: ${error}`   
+        `Failed to log user out because of exception: ${error}`
       );
     }
   };
