@@ -18,7 +18,6 @@ interface Props {
 const UserItemScroller = (props: Props) => {
   const { displayErrorMessage } = useMessageActions();
   const [items, setItems] = useState<User[]>([]);
-
   const { displayedUser, authToken } = useUserInfo();
   const { setDisplayedUser } = useUserInfoActions();
   const { displayedUser: displayedUserAliasParam } = useParams();
@@ -35,9 +34,10 @@ const UserItemScroller = (props: Props) => {
     displayErrorMessage: displayErrorMessage,
   };
 
-  const presenterRef = useRef<UserItemPresenter | null>(null);  // useRef hook, with default of null
-  if (!presenterRef.current) {                                  // so that this doesn't restart with every rerender
-    presenterRef.current = props.presenterFactory(listener);   // if we don't have a current version already, set it
+  const presenterRef = useRef<UserItemPresenter | null>(null); // useRef hook, with default of null
+  if (!presenterRef.current) {
+    // so that this doesn't restart with every rerender
+    presenterRef.current = props.presenterFactory(listener); // if we don't have a current version already, set it
   }
 
   // Update the displayed user context variable whenever the displayedUser url parameter changes. This allows browser forward and back buttons to work correctly.
@@ -47,11 +47,13 @@ const UserItemScroller = (props: Props) => {
       displayedUserAliasParam &&
       displayedUserAliasParam != displayedUser!.alias
     ) {
-      presenterRef.current!.getUser(authToken, displayedUserAliasParam).then((toUser) => {
-        if (toUser) {
-          setDisplayedUser(toUser);
-        }
-      });
+      presenterRef
+        .current!.getUser(authToken, displayedUserAliasParam)
+        .then((toUser) => {
+          if (toUser) {
+            setDisplayedUser(toUser);
+          }
+        });
     }
   }, [displayedUserAliasParam]);
 
@@ -70,7 +72,6 @@ const UserItemScroller = (props: Props) => {
   const loadMoreItems = async () => {
     presenterRef.current!.loadMoreItems(authToken!, displayedUser!.alias);
   };
-
 
   return (
     <div className="container px-0 overflow-visible vh-100">
