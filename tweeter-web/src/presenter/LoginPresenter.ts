@@ -1,32 +1,35 @@
-// import { UserService } from "src/model.service/UserService";
-// import { User } from "tweeter-shared";
+import { UserService } from "src/model.service/UserService";
+import { AuthToken, User } from "tweeter-shared";
 
-
-export class LoginView{
-  dummy: string = "Dummy";
+export interface LoginView {
+  displayErrorMessage: (message: string) => void;
 }
 
-// export class LoginPresenter {
-//     private userService: UserService;
+export class LoginPresenter {
+  private userService: UserService;
+  public view: LoginView;
 
-//     public constructor(){
-//         this.userService = new UserService();
-//     }
+  public constructor(view: LoginView) {
+    this.userService = new UserService();
+    this.view = view;
+  }
+
+  // public async login(alias: string, password: string) {
+  //   try {
+  //     return await this.userService.login(alias, password);
+  //   } catch (error) {
+  //     this.view.displayErrorMessage(
+  //       `Failed to log user in because of exception: ${error}`
+  //     );
+  //   }
+  // }
 
 
-//   public async doLogin(alias: string, password: string) {
-
-//     const [user, authToken] = await this.userService.login(alias, password);
-
-//     updateUserInfo(user, user, authToken, rememberMe);
-
-//     if (!!props.originalUrl) {
-//       navigate(props.originalUrl);
-//     } else {
-//       navigate(`/feed/${user.alias}`);
-//     }
-//   }
-//   catch(error) {
-//     displayErrorMessage(`Failed to log user in because of exception: ${error}`);
-//   }
-// }
+    public async login(alias: string, password: string): Promise<[User, AuthToken]> {
+    try{
+      return await this.userService.login(alias, password);
+    } catch (error){
+      throw error;
+    }
+  }
+}
