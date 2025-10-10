@@ -14,7 +14,6 @@ export class NavigationPresenter {
     authToken: AuthToken,
     alias: string
   ): Promise<User | null> {
-    // TODO: Replace with the result of calling server
     return this.service.getUser(authToken, alias);
   }
 }
