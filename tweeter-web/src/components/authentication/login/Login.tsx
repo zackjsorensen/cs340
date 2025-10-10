@@ -7,7 +7,7 @@ import { AuthToken, FakeData, User } from "tweeter-shared";
 import AuthenticationFields from "../AuthFields";
 import { useMessageActions } from "src/components/toaster/MessageHooks";
 import { useUserInfoActions } from "src/components/userInfo/UserInfoHooks";
-import { LoginPresenter, LoginView } from "src/presenter/LoginPresenter";
+import { LoginPresenter } from "src/presenter/LoginPresenter";
 
 interface Props {
   originalUrl?: string;
@@ -33,11 +33,8 @@ const Login = (props: Props) => {
     }
   };
 
-  const listener: LoginView = {
-    displayErrorMessage: displayErrorMessage,
-  };
 
-  const presenter: LoginPresenter = new LoginPresenter(listener);
+  const presenter: LoginPresenter = new LoginPresenter();
 
   const doLogin = async () => {
     try {

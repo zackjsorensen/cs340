@@ -8,6 +8,7 @@ import { Buffer } from "buffer";
 import AuthenticationFields from "../AuthFields";
 import { useMessageActions } from "src/components/toaster/MessageHooks";
 import { useUserInfoActions } from "src/components/userInfo/UserInfoHooks";
+import { RegisterPresenter } from "src/presenter/RegisterPresenter";
 
 const Register = () => {
   const [firstName, setFirstName] = useState("");
@@ -82,11 +83,14 @@ const Register = () => {
     return file.name.split(".").pop();
   };
 
+const presenter: RegisterPresenter = new RegisterPresenter();
+
+
   const doRegister = async () => {
     try {
       setIsLoading(true);
 
-      const [user, authToken] = await register(
+      const [user, authToken] = await presenter.register(
         firstName,
         lastName,
         alias,
@@ -106,27 +110,6 @@ const Register = () => {
     }
   };
 
-  const register = async (
-    firstName: string,
-    lastName: string,
-    alias: string,
-    password: string,
-    userImageBytes: Uint8Array,
-    imageFileExtension: string
-  ): Promise<[User, AuthToken]> => {
-    // Not neded now, but will be needed when you make the request to the server in milestone 3
-    const imageStringBase64: string =
-      Buffer.from(userImageBytes).toString("base64");
-
-    // TODO: Replace with the result of calling the server
-    const user = FakeData.instance.firstUser;
-
-    if (user === null) {
-      throw new Error("Invalid registration");
-    }
-
-    return [user, FakeData.instance.authToken];
-  };
 
   const inputFieldFactory = () => {
     return (
