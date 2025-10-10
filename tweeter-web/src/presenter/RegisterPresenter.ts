@@ -1,6 +1,6 @@
 import { Buffer } from "buffer";
 import { UserService } from "src/model.service/UserService";
-import { User, AuthToken, FakeData } from "tweeter-shared";
+import { User, AuthToken } from "tweeter-shared";
 
 export class RegisterPresenter {
   service: UserService;

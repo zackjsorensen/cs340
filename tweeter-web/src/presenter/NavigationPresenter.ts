@@ -1,5 +1,5 @@
 import { UserService } from "src/model.service/UserService";
-import { AuthToken, User, FakeData } from "tweeter-shared";
+import { AuthToken, User} from "tweeter-shared";
 
 export class NavigationPresenter {
     service: UserService;

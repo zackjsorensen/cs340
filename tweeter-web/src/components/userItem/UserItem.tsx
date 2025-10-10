@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { AuthToken, User, FakeData } from "tweeter-shared";
 import { useMessageActions } from "../toaster/MessageHooks";
 import { useUserInfo, useUserInfoActions } from "../userInfo/UserInfoHooks";
+import { IndividualUserItemPresenter } from "src/presenter/IndividualUserItemPresenter";
 
 interface Props {
   user: User;
@@ -18,10 +19,10 @@ const UserItem = (props: Props) => {
   const navigateToUser = async (event: React.MouseEvent): Promise<void> => {
     event.preventDefault();
 
-    try {
-      const alias = extractAlias(event.target.toString());
+    const presenter: IndividualUserItemPresenter = new IndividualUserItemPresenter();
 
-      const toUser = await getUser(authToken!, alias);
+    try {
+      const toUser = await presenter.getUser(authToken!, event.target.toString());
 
       if (toUser) {
         if (!toUser.equals(displayedUser!)) {
@@ -34,19 +35,6 @@ const UserItem = (props: Props) => {
         `Failed to get user because of exception: ${error}`
       );
     }
-  };
-
-  const extractAlias = (value: string): string => {
-    const index = value.indexOf("@");
-    return value.substring(index);
-  };
-
-  const getUser = async (
-    authToken: AuthToken,
-    alias: string
-  ): Promise<User | null> => {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.findUserByAlias(alias);
   };
 
   return (

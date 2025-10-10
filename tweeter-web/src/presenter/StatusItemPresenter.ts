@@ -1,6 +1,6 @@
 import { StatusService } from "src/model.service/StatusService";
 import { UserService } from "src/model.service/UserService";
-import { AuthToken, FakeData, Status, User } from "tweeter-shared";
+import { AuthToken, Status, User } from "tweeter-shared";
 
 // let x = FakeData.instance.getPageOfStatuses(lastItem, pageSize);
 export const PAGE_SIZE = 10;
@@ -54,7 +54,7 @@ export abstract class StatusItemPresenter {
     alias: string
   ): Promise<User | null> {
     // TODO: Replace with the result of calling server
-    return FakeData.instance.findUserByAlias(alias);
+    return this.userService.getUser(authToken, alias);
   }
 
   public abstract loadMoreItems(authToken: AuthToken, userAlias: string): void;
