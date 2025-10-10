@@ -3,13 +3,20 @@ import { useState } from "react";
 import { AuthToken, Status } from "tweeter-shared";
 import { useMessageActions } from "../toaster/MessageHooks";
 import { useUserInfo } from "../userInfo/UserInfoHooks";
+import { PostStatusPresenter, PostStatusView } from "src/presenter/PostStatusPresenter";
 
 const PostStatus = () => {
   const { displayInfoMessage, displayErrorMessage, deleteMessage } = useMessageActions();
-
-  const { currentUser, authToken } = useUserInfo();
+  const { currentUser, authToken } = useUserInfo(); // move this?????
   const [post, setPost] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const listener: PostStatusView = {
+    displayErrorMessage: displayErrorMessage,
+    displayInfoMessage: displayInfoMessage
+  }
+
+  const presenterRef = new PostStatusPresenter(listener); // change later
 
   const submitPost = async (event: React.MouseEvent) => {
     event.preventDefault();
@@ -17,37 +24,28 @@ const PostStatus = () => {
     var postingStatusToastId = "";
 
     try {
-      setIsLoading(true);
+      setIsLoading(true); // move into Presenter?? No business logic involved...
       postingStatusToastId = displayInfoMessage(
         "Posting status...",
         0
       );
 
-      const status = new Status(post, currentUser!, Date.now());
-
-      await postStatus(authToken!, status);
-
+      presenterRef.postStatus(authToken!, currentUser!, post);
+      // const status = new Status(post, currentUser!, Date.now());
+      // await postStatus(authToken!, status);
       setPost("");
-      displayInfoMessage( "Status posted!", 2000);
-    } catch (error) {
-      displayErrorMessage(
-        `Failed to post the status because of exception: ${error}`
-      );
+      // displayInfoMessage( "Status posted!", 2000);
+    // } catch (error) {
+    //   displayErrorMessage(
+    //     `Failed to post the status because of exception: ${error}`
+     // );
     } finally {
       deleteMessage(postingStatusToastId);
       setIsLoading(false);
     }
   };
 
-  const postStatus = async (
-    authToken: AuthToken,
-    newStatus: Status
-  ): Promise<void> => {
-    // Pause so we can see the logging out message. Remove when connected to the server
-    await new Promise((f) => setTimeout(f, 2000));
-
-    // TODO: Call the server to post the status
-  };
+// postStatus was here
 
   const clearPost = (event: React.MouseEvent) => {
     event.preventDefault();

@@ -16,8 +16,8 @@ interface UserInfoActions {
 }
 
 const defaultUserInfoActions: UserInfoActions = {
-  updateUserInfo: () => null,
-  clearUserInfo: () => null,
+  updateUserInfo: () => null,  // what to do here? Is this for business logic?
+  clearUserInfo: () => null,         // or for display logic?
   setDisplayedUser: () => null,
 }
 
