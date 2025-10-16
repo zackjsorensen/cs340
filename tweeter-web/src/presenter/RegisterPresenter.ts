@@ -1,17 +1,24 @@
 import { Buffer } from "buffer";
 import { UserService } from "src/model.service/UserService";
 import { User, AuthToken } from "tweeter-shared";
+import { Presenter, View } from "./Presenter";
 
-export class RegisterPresenter {
+export interface RegisterView extends View {
+  authenticated: (user: User, authToken: AuthToken) => void;
+  navigate: (url: string) => void;
+}
+
+export class RegisterPresenter extends Presenter<RegisterView> {
   service: UserService;
 
-  public constructor() {
+  public constructor(view: RegisterView) {
+    super(view);
     this.service = new UserService();
   }
 
   public getFileExtension(file: File): string | undefined {
     return file.name.split(".").pop();
-  } // is it worth it to refactor and move this into here?
+  }
 
   public async processImageFile(file: File | undefined): Promise<Uint8Array> {
     const reader = new FileReader();
@@ -44,10 +51,10 @@ export class RegisterPresenter {
     password: string,
     userImageBytes: Uint8Array,
     imageFileExtension: string
-  ): Promise<[User, AuthToken]> {
+  ) {
     // Not neded now, but will be needed when you make the request to the server in milestone 3
     try {
-      return await this.service.register(
+      const [user, authToken] = await this.service.register(
         firstName,
         lastName,
         alias,
@@ -55,8 +62,12 @@ export class RegisterPresenter {
         userImageBytes,
         imageFileExtension
       );
+      this.view.authenticated(user, authToken);
+      this.view.navigate(`/feed/${user.alias}`);
     } catch (error) {
-      throw error;
+      this.view.displayErrorMessage(
+        `Failed to register user because of exception: ${error}`
+      );
     }
   }
 }

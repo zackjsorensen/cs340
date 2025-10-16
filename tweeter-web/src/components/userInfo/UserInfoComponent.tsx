@@ -4,7 +4,10 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AuthToken, User } from "tweeter-shared";
 import { useMessageActions } from "../toaster/MessageHooks";
 import { useUserInfo, useUserInfoActions } from "./UserInfoHooks";
-import { UserInfoPresenter } from "src/presenter/UserInfoPresenter";
+import {
+  UserInfoPresenter,
+  UserInfoView,
+} from "src/presenter/UserInfoPresenter";
 
 const UserInfo = () => {
   const [isFollower, setIsFollower] = useState(false);
@@ -12,7 +15,8 @@ const UserInfo = () => {
   const [followerCount, setFollowerCount] = useState(-1);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { displayErrorMessage, displayInfoMessage, deleteMessage } = useMessageActions();
+  const { displayErrorMessage, displayInfoMessage, deleteMessage } =
+    useMessageActions();
 
   const { currentUser, authToken, displayedUser } = useUserInfo();
   const { setDisplayedUser } = useUserInfoActions();
@@ -23,7 +27,16 @@ const UserInfo = () => {
     setDisplayedUser(currentUser!);
   }
 
-  const presenter: UserInfoPresenter = new UserInfoPresenter();
+  const view: UserInfoView = {
+    displayErrorMessage: displayErrorMessage,
+    displayInfoMessage: displayInfoMessage,
+    deleteMessage: deleteMessage,
+    setIsFollower: setIsFollower,
+    setFolloweeCount: setFolloweeCount,
+    setFollowerCount: setFollowerCount,
+  };
+
+  const presenter: UserInfoPresenter = new UserInfoPresenter(view);
 
   useEffect(() => {
     setIsFollowerStatus(authToken!, currentUser!, displayedUser!);
@@ -36,49 +49,22 @@ const UserInfo = () => {
     currentUser: User,
     displayedUser: User
   ) => {
-    try {
-      if (currentUser === displayedUser) {
-        setIsFollower(false);
-      } else {
-        setIsFollower(
-          await presenter.getIsFollowerStatus(authToken!, currentUser!, displayedUser!)
-        );
-      }
-    } catch (error) {
-      displayErrorMessage(
-        `Failed to determine follower status because of exception: ${error}`
-      );
-    }
+    await presenter.getIsFollowerStatus(authToken, currentUser, displayedUser);
   };
-
-
 
   const setNumbFollowees = async (
     authToken: AuthToken,
     displayedUser: User
   ) => {
-    try {
-      setFolloweeCount(await presenter.getFolloweeCount(authToken, displayedUser));
-    } catch (error) {
-      displayErrorMessage(
-        `Failed to get followees count because of exception: ${error}`
-      );
-    }
+    await presenter.getFolloweeCount(authToken, displayedUser);
   };
 
   const setNumbFollowers = async (
     authToken: AuthToken,
     displayedUser: User
   ) => {
-    try {
-      setFollowerCount(await presenter.getFollowerCount(authToken, displayedUser));
-    } catch (error) {
-      displayErrorMessage(
-        `Failed to get followers count because of exception: ${error}`
-      );
-    }
+    await presenter.getFollowerCount(authToken, displayedUser);
   };
-
 
   const switchToLoggedInUser = (event: React.MouseEvent): void => {
     event.preventDefault();
@@ -96,33 +82,10 @@ const UserInfo = () => {
   ): Promise<void> => {
     event.preventDefault();
 
-    var followingUserToast = "";
-
-    try {
-      setIsLoading(true);
-      followingUserToast = displayInfoMessage(
-        `Following ${displayedUser!.name}...`,
-        0
-      );
-
-      const [followerCount, followeeCount] = await presenter.follow(
-        authToken!,
-        displayedUser!
-      );
-
-      setIsFollower(true);
-      setFollowerCount(followerCount);
-      setFolloweeCount(followeeCount);
-    } catch (error) {
-      displayErrorMessage(
-        `Failed to follow user because of exception: ${error}`
-      );
-    } finally {
-      deleteMessage(followingUserToast);
-      setIsLoading(false);
-    }
+    setIsLoading(true);
+    await presenter.follow(authToken!, displayedUser!);
+    setIsLoading(false);
   };
-
 
   const unfollowDisplayedUser = async (
     event: React.MouseEvent

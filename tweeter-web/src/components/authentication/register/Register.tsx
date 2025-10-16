@@ -7,7 +7,8 @@ import { Buffer } from "buffer";
 import AuthenticationFields from "../AuthFields";
 import { useMessageActions } from "src/components/toaster/MessageHooks";
 import { useUserInfoActions } from "src/components/userInfo/UserInfoHooks";
-import { RegisterPresenter } from "src/presenter/RegisterPresenter";
+import { RegisterPresenter, RegisterView } from "src/presenter/RegisterPresenter";
+import { AuthToken, User } from "tweeter-shared";
 
 const Register = () => {
   const [firstName, setFirstName] = useState("");
@@ -23,8 +24,6 @@ const Register = () => {
   const navigate = useNavigate();
   const { updateUserInfo } = useUserInfoActions();
   const { displayErrorMessage } = useMessageActions();
-
-  const presenter: RegisterPresenter = new RegisterPresenter();
 
   const checkSubmitButtonStatus = (): boolean => {
     return (
@@ -48,6 +47,15 @@ const Register = () => {
     handleImageFile(file);
   };
 
+  const view: RegisterView = {
+    displayErrorMessage: displayErrorMessage,
+    authenticated: (user: User, authToken: AuthToken) => {
+      updateUserInfo(user, user, authToken, rememberMe);
+    },
+    navigate: navigate
+  }
+  const presenter: RegisterPresenter = new RegisterPresenter(view);
+
   const handleImageFile = async (file: File | undefined) => {
     if (file) {
       setImageUrl(URL.createObjectURL(file));
@@ -67,22 +75,14 @@ const Register = () => {
   const doRegister = async () => {
     try {
       setIsLoading(true);
-
-      const [user, authToken] = await presenter.register(
-        firstName,
+      await presenter.register(
+        firstName, 
         lastName,
         alias,
         password,
         imageBytes,
         imageFileExtension
-      );
-
-      updateUserInfo(user, user, authToken, rememberMe);
-      navigate(`/feed/${user.alias}`);
-    } catch (error) {
-      displayErrorMessage(
-        `Failed to register user because of exception: ${error}`
-      );
+      )
     } finally {
       setIsLoading(false);
     }
