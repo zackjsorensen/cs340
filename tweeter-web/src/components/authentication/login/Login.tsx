@@ -6,7 +6,8 @@ import AuthenticationFormLayout from "../AuthenticationFormLayout";
 import AuthenticationFields from "../AuthFields";
 import { useMessageActions } from "src/components/toaster/MessageHooks";
 import { useUserInfoActions } from "src/components/userInfo/UserInfoHooks";
-import { LoginPresenter } from "src/presenter/LoginPresenter";
+import { LoginPresenter, LoginView } from "src/presenter/LoginPresenter";
+import { AuthToken, User } from "tweeter-shared";
 
 interface Props {
   originalUrl?: string;
@@ -32,26 +33,19 @@ const Login = (props: Props) => {
     }
   };
 
-
-  const presenter: LoginPresenter = new LoginPresenter();
+  const view: LoginView = {
+    displayErrorMessage: displayErrorMessage,
+    authenticated: (user: User, authToken: AuthToken) => {
+      updateUserInfo(user, user, authToken, rememberMe);
+    },
+    navigate: navigate
+  }
+  const presenter: LoginPresenter = new LoginPresenter(view);
 
   const doLogin = async () => {
     try {
       setIsLoading(true);
-
-      const [user, authToken] = await presenter.login(alias, password);
-
-      updateUserInfo(user, user, authToken, rememberMe);
-
-      if (!!props.originalUrl) {
-        navigate(props.originalUrl);
-      } else {
-        navigate(`/feed/${user.alias}`);
-      }
-    } catch (error) {
-      displayErrorMessage(
-        `Failed to log user in because of exception: ${error}`
-      );
+      await presenter.login(alias, password, props.originalUrl);
     } finally {
       setIsLoading(false);
     }

@@ -64,10 +64,6 @@ const Register = () => {
     }
   };
 
-  const getFileExtension = (file: File): string | undefined => {
-    return file.name.split(".").pop();
-  };
-
   const doRegister = async () => {
     try {
       setIsLoading(true);
