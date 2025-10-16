@@ -72,7 +72,7 @@ export class UserInfoPresenter {
         `Following ${userToFollow!.name}...`,
         0
       );
-
+      await this.service.follow(authToken, userToFollow);
       const followerCount = await this.service.getFollowerCount(
         authToken,
         userToFollow

@@ -112,7 +112,7 @@ const UserInfo = () => {
               />
             </div>
             <div className="col p-3">
-              {!displayedUser.equals(currentUser) && (
+              {!displayedUser.  equals(currentUser) && (
                 <p id="returnToLoggedInUser">
                   Return to{" "}
                   <Link
