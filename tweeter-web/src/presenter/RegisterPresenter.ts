@@ -53,7 +53,7 @@ export class RegisterPresenter extends Presenter<RegisterView> {
     imageFileExtension: string
   ) {
     // Not neded now, but will be needed when you make the request to the server in milestone 3
-    try {
+    this.doFailureReportingOperation(async() => {
       const [user, authToken] = await this.service.register(
         firstName,
         lastName,
@@ -64,15 +64,6 @@ export class RegisterPresenter extends Presenter<RegisterView> {
       );
       this.view.authenticated(user, authToken);
       this.view.navigate(`/feed/${user.alias}`);
-    } catch (error) {
-      this.view.displayErrorMessage(
-        `Failed to register user because of exception: ${error}`
-      );
-    }
+    }, "register user");
   }
 }
-
-// how to do errors and setting?
-// leave in View?
-// Or do we change things so rather than returning, we set them
-//      through an interface like we did with addItems?

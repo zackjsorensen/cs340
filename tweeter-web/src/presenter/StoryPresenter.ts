@@ -1,13 +1,14 @@
-import { AuthToken } from "tweeter-shared";
-import { StatusItemPresenter, StatusItemView } from "./StatusItemPresenter";
+import { AuthToken, Status } from "tweeter-shared";
+import { StatusItemPresenter } from "./StatusItemPresenter";
+import { PagedItemView } from "./PagedItemPresenter";
 
 export class StoryPresenter extends StatusItemPresenter {
-    public constructor(view: StatusItemView){
+    public constructor(view: PagedItemView<Status>){
         super(view);
     }
 
   public async loadMoreItems(authToken: AuthToken, userAlias: string) {
-    try {
+    await this.doFailureReportingOperation(async() => {
       const [newItems, hasMore] = await this.statusService.loadMoreStoryItems(
         authToken!,
         userAlias,
@@ -18,10 +19,6 @@ export class StoryPresenter extends StatusItemPresenter {
       this.hasMoreItems = hasMore;
       this.lastItem = newItems.length > 0 ? newItems[newItems.length - 1]: null;
       this.view.addItems(newItems);
-    } catch (error) {
-      this.view.displayErrorMessage(
-        `Failed to load story items because of exception: ${error}`
-      );
-    }
+    }, "load story items")
   }
 }
