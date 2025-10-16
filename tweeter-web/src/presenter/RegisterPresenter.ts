@@ -13,6 +13,30 @@ export class RegisterPresenter {
     return file.name.split(".").pop();
   } // is it worth it to refactor and move this into here?
 
+  public async processImageFile(file: File | undefined): Promise<Uint8Array> {
+    const reader = new FileReader();
+    reader.onload = (event: ProgressEvent<FileReader>) => {
+      const imageStringBase64 = event.target?.result as string;
+
+      // Remove unnecessary file metadata from the start of the string.
+      const imageStringBase64BufferContents =
+        imageStringBase64.split("base64,")[1];
+
+      const bytes: Uint8Array = Buffer.from(
+        imageStringBase64BufferContents,
+        "base64"
+      );
+
+      return bytes;
+      // now the question is, do I return the bytes or keep them here?
+      // It's more efficient to just keep them here
+      // But feels safer to return them
+    };
+    reader.readAsDataURL(file!);
+    return new Uint8Array();
+
+  }
+
   public async register(
     firstName: string,
     lastName: string,

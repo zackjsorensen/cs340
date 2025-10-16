@@ -24,6 +24,8 @@ const Register = () => {
   const { updateUserInfo } = useUserInfoActions();
   const { displayErrorMessage } = useMessageActions();
 
+  const presenter: RegisterPresenter = new RegisterPresenter();
+
   const checkSubmitButtonStatus = (): boolean => {
     return (
       !firstName ||
@@ -46,29 +48,13 @@ const Register = () => {
     handleImageFile(file);
   };
 
-  const handleImageFile = (file: File | undefined) => {
+  const handleImageFile = async (file: File | undefined) => {
     if (file) {
       setImageUrl(URL.createObjectURL(file));
-
-      const reader = new FileReader();
-      reader.onload = (event: ProgressEvent<FileReader>) => {
-        const imageStringBase64 = event.target?.result as string;
-
-        // Remove unnecessary file metadata from the start of the string.
-        const imageStringBase64BufferContents =
-          imageStringBase64.split("base64,")[1];
-
-        const bytes: Uint8Array = Buffer.from(
-          imageStringBase64BufferContents,
-          "base64"
-        );
-
-        setImageBytes(bytes);
-      };
-      reader.readAsDataURL(file);
-
+      const bytes: Uint8Array = await presenter.processImageFile(file);
+      setImageBytes(bytes);
       // Set image file extension (and move to a separate method)
-      const fileExtension = getFileExtension(file);
+      const fileExtension = presenter.getFileExtension(file!);
       if (fileExtension) {
         setImageFileExtension(fileExtension);
       }
@@ -81,9 +67,6 @@ const Register = () => {
   const getFileExtension = (file: File): string | undefined => {
     return file.name.split(".").pop();
   };
-
-const presenter: RegisterPresenter = new RegisterPresenter();
-
 
   const doRegister = async () => {
     try {
@@ -108,7 +91,6 @@ const presenter: RegisterPresenter = new RegisterPresenter();
       setIsLoading(false);
     }
   };
-
 
   const inputFieldFactory = () => {
     return (
@@ -138,7 +120,11 @@ const presenter: RegisterPresenter = new RegisterPresenter();
           <label htmlFor="lastNameInput">Last Name</label>
         </div>
         <div className="form-floating">
-          <AuthenticationFields onEnter={registerOnEnter} setAlias={setAlias} setPassword={setPassword}/>
+          <AuthenticationFields
+            onEnter={registerOnEnter}
+            setAlias={setAlias}
+            setPassword={setPassword}
+          />
         </div>
         <div className="form-floating mb-3">
           <input

@@ -2,7 +2,6 @@ import { StatusService } from "src/model.service/StatusService";
 import { UserService } from "src/model.service/UserService";
 import { AuthToken, Status, User } from "tweeter-shared";
 
-// let x = FakeData.instance.getPageOfStatuses(lastItem, pageSize);
 export const PAGE_SIZE = 10;
 
 export interface StatusItemView {
