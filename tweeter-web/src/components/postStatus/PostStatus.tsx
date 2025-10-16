@@ -1,12 +1,12 @@
 import "./PostStatus.css";
 import { useState } from "react";
-import { AuthToken, Status } from "tweeter-shared";
 import { useMessageActions } from "../toaster/MessageHooks";
 import { useUserInfo } from "../userInfo/UserInfoHooks";
 import {
   PostStatusPresenter,
   PostStatusView,
 } from "src/presenter/PostStatusPresenter";
+import userEvent from "@testing-library/user-event";
 
 const PostStatus = () => {
   const { displayInfoMessage, displayErrorMessage, deleteMessage } =
@@ -18,28 +18,17 @@ const PostStatus = () => {
   const listener: PostStatusView = {
     displayErrorMessage: displayErrorMessage,
     displayInfoMessage: displayInfoMessage,
+    deleteMessage: deleteMessage,
+    setPost: setPost,
+    setIsLoading: setIsLoading
   };
 
   const presenterRef = new PostStatusPresenter(listener); // change later
 
   const submitPost = async (event: React.MouseEvent) => {
     event.preventDefault();
-
-    var postingStatusToastId = "";
-
-    try {
-      setIsLoading(true);
-      postingStatusToastId = displayInfoMessage("Posting status...", 0);
-
-      presenterRef.postStatus(authToken!, currentUser!, post);
-      setPost("");
-    } finally {
-      deleteMessage(postingStatusToastId);
-      setIsLoading(false);
-    }
+    await presenterRef.postStatus(authToken!, currentUser!, post);
   };
-
-  // postStatus was here
 
   const clearPost = (event: React.MouseEvent) => {
     event.preventDefault();

@@ -1,24 +1,24 @@
 import { StatusService } from "src/model.service/StatusService";
 import { UserService } from "src/model.service/UserService";
 import { AuthToken, Status, User } from "tweeter-shared";
+import { Presenter, View } from "./Presenter";
 
 export const PAGE_SIZE = 10;
 
-export interface StatusItemView {
+export interface StatusItemView extends View {
   addItems: (items: Status[]) => void;
   displayErrorMessage: (message: string) => void;
 }
 
-export abstract class StatusItemPresenter {
+export abstract class StatusItemPresenter extends Presenter<StatusItemView> {
   protected page_size = PAGE_SIZE;
-  private _view: StatusItemView;
   private _hasMoreItems: boolean = true;
   private _lastItem: Status | null = null;
   protected statusService: StatusService;
   protected userService: UserService;
 
   protected constructor(view: StatusItemView) {
-    this._view = view;
+    super(view);
     this.statusService = new StatusService();
     this.userService =  new UserService();
   }
@@ -37,10 +37,6 @@ export abstract class StatusItemPresenter {
 
   protected set hasMoreItems(value: boolean) {
     this._hasMoreItems = value;
-  }
-
-  protected get view() {
-    return this._view;
   }
 
   reset() {
