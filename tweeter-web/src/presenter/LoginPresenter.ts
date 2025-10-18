@@ -1,34 +1,32 @@
 import { UserService } from "src/model.service/UserService";
 import { AuthToken, User } from "tweeter-shared";
 import { Presenter, View } from "./Presenter";
+import { AuthPresenter, MyRequest } from "./AuthPresenter";
 
-export interface LoginView extends View {
-  authenticated: (user: User, authToken: AuthToken) => void;
-  navigate: (url: string) => void;
+export interface LoginRequest extends MyRequest {
+  alias: string;
+  password: string;
+  originalUrl: string | undefined;
 }
 
-export class LoginPresenter extends Presenter<LoginView> {
-  private userService: UserService;
+export class LoginPresenter extends AuthPresenter<LoginRequest> {
 
-  public constructor(view: LoginView) {
-    super(view);
-    this.userService = new UserService();
+  public async sumbit(data: LoginRequest): Promise<[User, AuthToken]> {
+      return await this.service.login(
+        data.alias,
+        data.password
+      )
   }
 
-  public async login(
-    alias: string,
-    password: string,
-    originalUrl: string | undefined
-  ) {
-    this.doFailureReportingOperation(async () => {
-      const [user, authToken] = await this.userService.login(alias, password);
-      this.view.authenticated(user, authToken);
-
-      if (!!originalUrl) {
-        this.view.navigate(originalUrl);
+  protected doNavigation(url: string, data: LoginRequest): void {
+      if ((data) && (data.originalUrl)){
+        this.view.navigate(data.originalUrl);
       } else {
-        this.view.navigate(`/feed/${user.alias}`);
+        this.view.navigate(url);
       }
-    }, "log user in");
+  }
+
+  protected operation_description(): string {
+      return "log user in";
   }
 }

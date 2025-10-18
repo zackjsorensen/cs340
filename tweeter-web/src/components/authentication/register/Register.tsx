@@ -7,8 +7,12 @@ import { Buffer } from "buffer";
 import AuthenticationFields from "../AuthFields";
 import { useMessageActions } from "src/components/toaster/MessageHooks";
 import { useUserInfoActions } from "src/components/userInfo/UserInfoHooks";
-import { RegisterPresenter, RegisterView } from "src/presenter/RegisterPresenter";
+import {
+  RegisterPresenter,
+  RegisterRequest,
+} from "src/presenter/RegisterPresenter";
 import { AuthToken, User } from "tweeter-shared";
+import { AuthView, MyRequest } from "src/presenter/AuthPresenter";
 
 const Register = () => {
   const [firstName, setFirstName] = useState("");
@@ -47,13 +51,13 @@ const Register = () => {
     handleImageFile(file);
   };
 
-  const view: RegisterView = {
+  const view: AuthView = {
     displayErrorMessage: displayErrorMessage,
     authenticated: (user: User, authToken: AuthToken) => {
       updateUserInfo(user, user, authToken, rememberMe);
     },
-    navigate: navigate
-  }
+    navigate: navigate,
+  };
   const presenter: RegisterPresenter = new RegisterPresenter(view);
 
   const handleImageFile = async (file: File | undefined) => {
@@ -75,14 +79,15 @@ const Register = () => {
   const doRegister = async () => {
     try {
       setIsLoading(true);
-      await presenter.register(
-        firstName, 
+      const data: RegisterRequest = {
+        firstName,
         lastName,
         alias,
         password,
-        imageBytes,
-        imageFileExtension
-      )
+        userImageBytes: imageBytes,
+        imageFileExtension,
+      };
+      await presenter.doAuthentication(data);
     } finally {
       setIsLoading(false);
     }

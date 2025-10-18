@@ -6,8 +6,9 @@ import AuthenticationFormLayout from "../AuthenticationFormLayout";
 import AuthenticationFields from "../AuthFields";
 import { useMessageActions } from "src/components/toaster/MessageHooks";
 import { useUserInfoActions } from "src/components/userInfo/UserInfoHooks";
-import { LoginPresenter, LoginView } from "src/presenter/LoginPresenter";
+import { LoginPresenter, LoginRequest } from "src/presenter/LoginPresenter";
 import { AuthToken, User } from "tweeter-shared";
+import { AuthView } from "src/presenter/AuthPresenter";
 
 interface Props {
   originalUrl?: string;
@@ -33,7 +34,7 @@ const Login = (props: Props) => {
     }
   };
 
-  const view: LoginView = {
+  const view: AuthView = {
     displayErrorMessage: displayErrorMessage,
     authenticated: (user: User, authToken: AuthToken) => {
       updateUserInfo(user, user, authToken, rememberMe);
@@ -45,7 +46,12 @@ const Login = (props: Props) => {
   const doLogin = async () => {
     try {
       setIsLoading(true);
-      await presenter.login(alias, password, props.originalUrl);
+      const data: LoginRequest = {
+        alias,
+        password,
+        originalUrl: props.originalUrl
+      }
+      await presenter.doAuthentication(data);
     } finally {
       setIsLoading(false);
     }
