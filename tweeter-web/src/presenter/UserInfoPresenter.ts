@@ -53,57 +53,49 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
   }
 
   public async follow(authToken: AuthToken, userToFollow: User) {
-    var followingUserToast = "";
-    try {
-      await this.doFailureReportingOperation(async () => {
-        followingUserToast = this.view.displayInfoMessage(
-          `Following ${userToFollow!.name}...`,
-          0
-        );
-        await this.service.follow(authToken, userToFollow);
-        const followerCount = await this.service.getFollowerCount(
-          authToken,
-          userToFollow
-        );
-        const followeeCount = await this.service.getFolloweeCount(
-          authToken,
-          userToFollow
-        );
-
-        this.view.setIsFollower(true);
-        this.view.setFollowerCount(followerCount);
-        this.view.setFolloweeCount(followeeCount);
-      }, "follow user");
-    } finally {
-      this.view.deleteMessage(followingUserToast);
-    }
+   this.toggleFollow(authToken, userToFollow, "follow", this.service.follow)
   }
 
   public async unfollow(authToken: AuthToken, userToUnfollow: User) {
-    var unfollowingUserToast = "";
+    this.toggleFollow(authToken, userToUnfollow, "unfollow", this.service.unfollow);
+  }
+
+  public async toggleFollow(
+    authToken: AuthToken,
+    userToToggle: User,
+    action: string,
+    doAction: (authToken: AuthToken, userToToggle: User) => void
+  ) {
+    var userToast = "";
     try {
       await this.doFailureReportingOperation(async () => {
-        unfollowingUserToast = this.view.displayInfoMessage(
-          `Unfollowing ${userToUnfollow!.name}...`,
+        userToast = this.view.displayInfoMessage(
+          `${action}ing ${userToToggle!.name}...`,
           0
         );
-
-        await this.service.unfollow(authToken, userToUnfollow);
+        // need to figure this out
+        await this.service.follow(authToken, userToToggle);
+        await doAction(authToken, userToToggle);
         const followerCount = await this.service.getFollowerCount(
           authToken,
-          userToUnfollow
+          userToToggle
         );
         const followeeCount = await this.service.getFolloweeCount(
           authToken,
-          userToUnfollow
+          userToToggle
         );
 
-        this.view.setIsFollower(false);
+        let wantToFollow: boolean = false;
+        if (action === "follow") {
+          wantToFollow = true;
+        }
+
+        this.view.setIsFollower(wantToFollow);
         this.view.setFollowerCount(followerCount);
         this.view.setFolloweeCount(followeeCount);
-      }, "unfollow user");
+      }, `${action} user`);
     } finally {
-      this.view.deleteMessage(unfollowingUserToast);
+      this.view.deleteMessage(userToast);
     }
   }
 }
