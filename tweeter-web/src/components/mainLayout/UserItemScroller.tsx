@@ -5,14 +5,12 @@ import { useParams } from "react-router-dom";
 import UserItem from "../userItem/UserItem";
 import { useMessageActions } from "../toaster/MessageHooks";
 import { useUserInfo, useUserInfoActions } from "../userInfo/UserInfoHooks";
-import {
-  UserItemPresenter,
-  UserItemView,
-} from "src/presenter/UserItemPresenter";
+import { UserItemPresenter } from "src/presenter/UserItemPresenter";
+import { PagedItemView } from "src/presenter/PagedItemPresenter";
 
 interface Props {
   featureUrl: string;
-  presenterFactory: (listener: UserItemView) => UserItemPresenter;
+  presenterFactory: (listener: PagedItemView<User>) => UserItemPresenter;
 }
 
 const UserItemScroller = (props: Props) => {
@@ -25,7 +23,7 @@ const UserItemScroller = (props: Props) => {
   // can't direcly implement the interface with a function
   // so create an object that does
 
-  const listener: UserItemView = {
+  const listener: PagedItemView<User> = {
     // what is listening for changes in the presenter, it's an observer
     // will be able to access component stuff AND implement the interface
     // we want to be able to call methods from the Presenter and update the component

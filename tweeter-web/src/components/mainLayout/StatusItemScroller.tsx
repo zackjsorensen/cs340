@@ -5,16 +5,14 @@ import { useParams } from "react-router-dom";
 import StatusItem from "./StatusItem";
 import { useMessageActions } from "../toaster/MessageHooks";
 import { useUserInfo, useUserInfoActions } from "../userInfo/UserInfoHooks";
-import {
-  StatusItemPresenter,
-  StatusItemView,
-} from "src/presenter/StatusItemPresenter";
+import { StatusItemPresenter } from "src/presenter/StatusItemPresenter";
+import { PagedItemView } from "src/presenter/PagedItemPresenter";
 
 // TODO: put the navigate and j code back in the first thing....
 
 interface Props {
   featureUrl: string;
-  presenterFactory: (listener: StatusItemView) => StatusItemPresenter;
+  presenterFactory: (listener: PagedItemView<Status>) => StatusItemPresenter;
 }
 
 const StatusItemScroller = (props: Props) => {
@@ -24,7 +22,7 @@ const StatusItemScroller = (props: Props) => {
   const { setDisplayedUser } = useUserInfoActions();
   const { displayedUser: displayedUserAliasParam } = useParams();
 
-  const listener: StatusItemView = {
+  const listener: PagedItemView<Status> = {
     addItems: (newItems: Status[]) =>
       setItems((previousItems) => [...previousItems, ...newItems]),
     displayErrorMessage: displayErrorMessage,

@@ -4,8 +4,12 @@ import { PagedItemPresenter, PagedItemView } from "./PagedItemPresenter";
 
 export const PAGE_SIZE = 10;
 
-export abstract class StatusItemPresenter extends PagedItemPresenter<Status> {
+export abstract class StatusItemPresenter extends PagedItemPresenter<Status, StatusService> {
   protected page_size = PAGE_SIZE;
   protected statusService: StatusService = new StatusService();
+
+  protected serviceFactory(): StatusService {
+      return new StatusService()
+  }
 
 }

@@ -1,6 +1,7 @@
 import { AuthToken, User, FakeData } from "tweeter-shared";
+import { Service } from "./Service";
 
-export class Followservice {
+export class Followservice implements Service{
   // convert arrow functions to methods now that they are in a class
   public async loadMoreFollowees(
     authToken: AuthToken,
