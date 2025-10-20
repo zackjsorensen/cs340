@@ -6,29 +6,31 @@ import StatusItem from "./StatusItem";
 import { useMessageActions } from "../toaster/MessageHooks";
 import { useUserInfo, useUserInfoActions } from "../userInfo/UserInfoHooks";
 import { StatusItemPresenter } from "src/presenter/StatusItemPresenter";
-import { PagedItemView } from "src/presenter/PagedItemPresenter";
+import { PagedItemPresenter, PagedItemView } from "src/presenter/PagedItemPresenter";
+import { Service } from "src/model.service/Service";
 
 // TODO: put the navigate and j code back in the first thing....
 
-interface Props {
+interface Props <T, U extends Service> {
   featureUrl: string;
-  presenterFactory: (listener: PagedItemView<Status>) => StatusItemPresenter;
+  presenterFactory: (listener: PagedItemView<T>) => PagedItemPresenter<T, Service>;
+  itemComponentFactory: (item: T, featurePath: string) => JSX.Element;
 }
 
-const StatusItemScroller = (props: Props) => {
+const ItemScroller = <T, U extends Service>(props: Props<T, U>) => {
   const { displayErrorMessage } = useMessageActions();
-  const [items, setItems] = useState<Status[]>([]);
+  const [items, setItems] = useState<T[]>([]);
   const { displayedUser, authToken } = useUserInfo();
   const { setDisplayedUser } = useUserInfoActions();
   const { displayedUser: displayedUserAliasParam } = useParams();
 
-  const listener: PagedItemView<Status> = {
-    addItems: (newItems: Status[]) =>
+  const listener: PagedItemView<T> = {
+    addItems: (newItems: T[]) =>
       setItems((previousItems) => [...previousItems, ...newItems]),
     displayErrorMessage: displayErrorMessage,
   };
 
-  const presenterRef = useRef<StatusItemPresenter | null>(null);
+  const presenterRef = useRef<PagedItemPresenter<T, Service> | null>(null);
   if (!presenterRef.current) {
     presenterRef.current = props.presenterFactory(listener);
   }
@@ -79,7 +81,7 @@ const StatusItemScroller = (props: Props) => {
             key={index}
             className="row mb-3 mx-0 px-0 border rounded bg-white"
           >
-            <StatusItem page={props.featureUrl} item={item} />
+            {props.itemComponentFactory(item, props.featureUrl)}
           </div>
         ))}
       </InfiniteScroll>
@@ -87,4 +89,4 @@ const StatusItemScroller = (props: Props) => {
   );
 };
 
-export default StatusItemScroller;
+export default ItemScroller;
