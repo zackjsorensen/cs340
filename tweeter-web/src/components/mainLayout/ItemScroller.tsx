@@ -1,11 +1,8 @@
-import { Status } from "tweeter-shared";
 import { useState, useEffect, useRef } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useParams } from "react-router-dom";
-import StatusItem from "./StatusItem";
 import { useMessageActions } from "../toaster/MessageHooks";
 import { useUserInfo, useUserInfoActions } from "../userInfo/UserInfoHooks";
-import { StatusItemPresenter } from "src/presenter/StatusItemPresenter";
 import { PagedItemPresenter, PagedItemView } from "src/presenter/PagedItemPresenter";
 import { Service } from "src/model.service/Service";
 

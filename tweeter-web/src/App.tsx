@@ -10,7 +10,6 @@ import Login from "./components/authentication/login/Login";
 import Register from "./components/authentication/register/Register";
 import MainLayout from "./components/mainLayout/MainLayout";
 import Toaster from "./components/toaster/Toaster";
-import UserItemScroller from "./components/mainLayout/UserItemScroller";
 import ItemScroller from "./components/mainLayout/ItemScroller";
 import { useUserInfo } from "./components/userInfo/UserInfoHooks";
 import { FolloweePresenter } from "./presenter/FolloweePresenter";
@@ -80,7 +79,7 @@ const AuthenticatedRoutes = () => {
                 new StoryPresenter(view)
               }
               itemComponentFactory={(item: Status, featurePath: string) => {
-                return <StatusItem page={featurePath} item={item}/>
+                return <StatusItem page={featurePath} item={item} />;
               }}
             />
           }
@@ -95,7 +94,7 @@ const AuthenticatedRoutes = () => {
                 new FolloweePresenter(view)
               }
               itemComponentFactory={(item: User, featurePath: string) => {
-                return <UserItem user={item} featurePath={featurePath} />
+                return <UserItem user={item} featurePath={featurePath} />;
               }}
             />
           }
@@ -103,12 +102,15 @@ const AuthenticatedRoutes = () => {
         <Route
           path="followers/:displayedUser"
           element={
-            <UserItemScroller
+            <ItemScroller<User, UserService>
               key={`followers-${displayedUser!.alias}`}
               featureUrl="/followers"
               presenterFactory={(view: PagedItemView<User>) =>
                 new FollowerPresenter(view)
               }
+              itemComponentFactory={(item: User, featurePath: string) => {
+                return <UserItem user={item} featurePath={featurePath} />;
+              }}
             />
           }
         />
