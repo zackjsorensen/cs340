@@ -1,6 +1,6 @@
 import "./Login.css";
 import "bootstrap/dist/css/bootstrap.css";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AuthenticationFormLayout from "../AuthenticationFormLayout";
 import AuthenticationFields from "../AuthFields";
@@ -12,6 +12,7 @@ import { AuthView } from "src/presenter/AuthPresenter";
 
 interface Props {
   originalUrl?: string;
+  presenter?: LoginPresenter;
 }
 
 const Login = (props: Props) => {
@@ -41,7 +42,15 @@ const Login = (props: Props) => {
     },
     navigate: navigate
   }
-  const presenter: LoginPresenter = new LoginPresenter(view);
+  const presenter = useRef<LoginPresenter | null>(null);
+  if (!presenter.current) {
+    presenter.current = props.presenter ?? new LoginPresenter(view);
+  }
+
+  // create new presenterRef whenever 'rememberMe' is updated
+  useEffect(()=> {
+    presenter.current = props.presenter ?? new LoginPresenter(view);
+  }, [rememberMe]); // add to dependency list
 
   const doLogin = async () => {
     try {
@@ -51,7 +60,10 @@ const Login = (props: Props) => {
         password,
         originalUrl: props.originalUrl
       }
-      await presenter.doAuthentication(data);
+      if(presenter.current){
+        await presenter.current.doAuthentication(data);
+      } else {throw new Error("LoginPresenter was not initialized");}
+      
     } finally {
       setIsLoading(false);
     }
