@@ -50,7 +50,9 @@
     "verbose": true,
     "testEnvironment": "jsdom",
     "moduleNameMapper": {
-        "\\.(css|less)$": "<rootDir>/test/__mocks__/styleMock.js"
+        "\\.(css|less)$": "<rootDir>/test/__mocks__/styleMock.js",
+        "^src/(.*)$": "<rootDir>/src/$1",
+        "^tweeter-shared(.*)$": "<rootDir>/../tweeter-shared/src/$1"
     },
     "testMatch": [
         "<rootDir>/test/**/*.test.tsx",
