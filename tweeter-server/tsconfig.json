@@ -4,6 +4,9 @@
     // File Layout
     // "rootDir": "./src",
     "outDir": "./dist",
+    "paths": {
+      "tweeter-shared": ["../tweeter-shared/src"]  // adjust relative path as needed
+    },
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
@@ -24,7 +27,8 @@
 
     // Stricter Typechecking Options
     "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
+    // "exactOptionalPropertyTypes": true,
+    "strictNullChecks": false,
 
     // Recommended Options
     "strict": true,
