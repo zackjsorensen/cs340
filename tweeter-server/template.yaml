@@ -120,7 +120,7 @@ Resources:
                 responses: *commonAmazonResponses
               responses: *commonSwaggerResponses
 
-          /user/create:  ##### TODO: Set endpoint URL
+          /follow/get-followers:  ##### TODO: Set endpoint URL
             post:
               consumes: *commonConsumes
               produces: *commonProduces
@@ -185,8 +185,29 @@ Resources:
             RestApiId: !Ref tweeterApi
             ##### TODO: Modify the Path property to the actual endpoint URL.
             ##### It must match the URL in the "Endpoint definitions" section above.
-            Path: /user/get
+            Path: /followees
             Method: POST
+
+
+  getMoreFollowers:
+    Type: AWS::Serverless::Function
+    Properties:
+      ##### TODO: Change "userGetFunction" to the actual function name.
+      FunctionName: getMoreFollowers
+      ##### TODO: Modify Handler property to match your code. This identifies the exact function that the lambda should run.
+      Handler: tweeter-server/src/lambda/follow/GetFollowersLambda.handler
+      # handlers/users/UserGetHandler.userGetHandler
+      Policies: *commonPolicies
+      Events:
+        PostApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref tweeterApi
+            ##### TODO: Modify the Path property to the actual endpoint URL.
+            ##### It must match the URL in the "Endpoint definitions" section above.
+            Path: /followers
+            Method: POST
+
 
   userCreateFunction:  ##### TODO: Set function name
     Type: AWS::Serverless::Function
