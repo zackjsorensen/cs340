@@ -10,16 +10,10 @@ export class GetFolloweesLambda extends GetPagedItemsLambda{
 
 const handlerInstance = new GetFolloweesLambda();
 
-export const handler = async (request: PagedUserItemRequest):Promise<PagedUserItemResponse> => handlerInstance.loadMoreItems(request);
-
-// export const handler = async (request: PagedUserItemRequest): Promise<PagedUserItemResponse> => {
-//     // this is the function that will be called by API gateway when we make a request to get more followees
-//     const followService = new Followservice();
-//     const [items, hasMore] = await followService.loadMoreFollowees(request.token, request.userAlias, request.pageSize, request.lastItem);
-
-//     return {
-//         success: true,
-//         message: null,
-//         items: items,
-//         hasMore: hasMore
-    // }
+export const handler = async (request: PagedUserItemRequest):Promise<PagedUserItemResponse> => {
+    
+    console.log("Incoming Request");
+    console.log(request);
+    return await handlerInstance.loadMoreItems(request);
+}
+    

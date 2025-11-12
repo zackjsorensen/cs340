@@ -9,7 +9,7 @@ Description: SAM config for Tweeter server
 Globals:
   Function:
     Runtime: nodejs20.x
-    CodeUri: ./dist/
+    CodeUri: ./dist/tweeter-server/
     Layers:
       - !Ref tweeterLayer
     Timeout: 30
@@ -129,7 +129,22 @@ Resources:
                 httpMethod: POST
                 uri:
                   ##### TODO: Set function name
-                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${userCreateFunction.Arn}/invocations
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${getMoreFollowers.Arn}/invocations
+                requestTemplates: *commonRequestTemplates
+                responses: *commonAmazonResponses
+              responses: *commonSwaggerResponses
+
+          
+          /follow/get-is-follwer:  ##### TODO: Set endpoint URL
+            post:
+              consumes: *commonConsumes
+              produces: *commonProduces
+              x-amazon-apigateway-integration:
+                type: aws
+                httpMethod: POST
+                uri:
+                  ##### TODO: Set function name
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${getIsFollower.Arn}/invocations
                 requestTemplates: *commonRequestTemplates
                 responses: *commonAmazonResponses
               responses: *commonSwaggerResponses
@@ -175,7 +190,7 @@ Resources:
       ##### TODO: Change "userGetFunction" to the actual function name.
       FunctionName: getMoreFollowees
       ##### TODO: Modify Handler property to match your code. This identifies the exact function that the lambda should run.
-      Handler: tweeter-server/src/lambda/follow/GetFolloweesLambda.handler
+      Handler: src/lambda/follow/GetFolloweesLambda.handler
       # handlers/users/UserGetHandler.userGetHandler
       Policies: *commonPolicies
       Events:
@@ -189,6 +204,16 @@ Resources:
             Method: POST
 
 
+  GetMoreFolloweesPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt getMoreFollowees.Arn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${tweeterApi}/*/*/follow/get-followees
+
+
+
   getMoreFollowers:
     Type: AWS::Serverless::Function
     Properties:
@@ -197,6 +222,26 @@ Resources:
       ##### TODO: Modify Handler property to match your code. This identifies the exact function that the lambda should run.
       Handler: tweeter-server/src/lambda/follow/GetFollowersLambda.handler
       # handlers/users/UserGetHandler.userGetHandler
+      Policies: *commonPolicies
+      Events:
+        PostApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref tweeterApi
+            ##### TODO: Modify the Path property to the actual endpoint URL.
+            ##### It must match the URL in the "Endpoint definitions" section above.
+            Path: /followers
+            Method: POST
+
+    
+
+  getIsFollower:
+    Type: AWS::Serverless::Function
+    Properties:
+      ##### TODO: Change "userGetFunction" to the actual function name.
+      FunctionName: getIsFollower
+      ##### TODO: Modify Handler property to match your code. This identifies the exact function that the lambda should run.
+      Handler: tweeter-server/src/lambda/follow/getIsFollowerStatusLambda.handler
       Policies: *commonPolicies
       Events:
         PostApi:

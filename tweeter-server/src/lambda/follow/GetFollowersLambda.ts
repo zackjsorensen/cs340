@@ -17,14 +17,3 @@ export class GetFollowersLambda extends GetPagedItemsLambda{
 const handlerInstance = new GetFollowersLambda();
 
 export const handler = async (request: PagedUserItemRequest): Promise<PagedUserItemResponse> => handlerInstance.loadMoreItems(request);
-
-// export const handler = async (request: PagedUserItemRequest): Promise<PagedUserItemResponse> => {
-//     const followService = new Followservice();
-//     const [items, hasMore] = await followService.loadMoreFollowers(request.token, request.userAlias, request.pageSize, request.lastItem);
-//     return {
-//         success: true,
-//         message: null,
-//         items: items,
-//         hasMore: hasMore
-//     }
-// }
