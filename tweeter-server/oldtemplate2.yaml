@@ -31,6 +31,8 @@ Metadata:
 
   x-common-cors-headers: &commonCorsHeaders
     method.response.header.Access-Control-Allow-Origin: "'*'"
+    method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+    # method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST,GET'"
 
   x-common-swagger-response-headers: &commonSwaggerResponseHeaders
     Access-Control-Allow-Origin:
@@ -53,7 +55,7 @@ Resources:
       Name: tweeterApi
       StageName: prod
       Cors:
-        AllowMethods: "'GET,POST,PUT,DELETE'"
+        AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
         AllowHeaders: "'*'"
         AllowOrigin: "'*'"
       DefinitionBody:
@@ -120,6 +122,58 @@ Resources:
                 responses: *commonAmazonResponses
               responses: *commonSwaggerResponses
 
+            options:
+              consumes:
+                - application/json
+              produces:
+                - application/json
+              responses:
+                "200":
+                  description: "CORS preflight OK"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: string
+                    Access-Control-Allow-Headers:
+                      type: string
+                    Access-Control-Allow-Methods:
+                      type: string
+              x-amazon-apigateway-integration:
+                type: mock
+                requestTemplates:
+                  application/json: '{"statusCode": 200}'
+                responses:
+                  default:
+                    statusCode: 200
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+                      method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST'"
+                    responseTemplates:
+                      application/json: '{}'
+
+
+            # options:
+            #   consumes:
+            #     - application/json
+            #   produces:
+            #     - application/json
+            #   x-amazon-apigateway-integration:
+            #     type: mock
+            #     requestTemplates:
+            #       application/json: '{"statusCode": 200}'
+            #     responses:
+            #       default:
+            #         statusCode: 200
+            #         responseParameters:
+            #           method.response.header.Access-Control-Allow-Origin: "'*'"
+            #           method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+            #           method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST'"
+            #         responseTemplates:
+            #           application/json: '{}'
+            #   responses:
+            #     "200":
+            #       description: "CORS preflight OK"
+
           /follow/get-followers:  ##### TODO: Set endpoint URL
             post:
               consumes: *commonConsumes
@@ -133,6 +187,56 @@ Resources:
                 requestTemplates: *commonRequestTemplates
                 responses: *commonAmazonResponses
               responses: *commonSwaggerResponses
+
+            options:
+              consumes:
+                - application/json
+              produces:
+                - application/json
+              responses:
+                "200":
+                  description: "CORS preflight OK"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: string
+                    Access-Control-Allow-Headers:
+                      type: string
+                    Access-Control-Allow-Methods:
+                      type: string
+              x-amazon-apigateway-integration:
+                type: mock
+                requestTemplates:
+                  application/json: '{"statusCode": 200}'
+                responses:
+                  default:
+                    statusCode: 200
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+                      method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST'"
+                    responseTemplates:
+                      application/json: '{}'
+            # options:
+            #   consumes:
+            #     - application/json
+            #   produces:
+            #     - application/json
+            #   x-amazon-apigateway-integration:
+            #     type: mock
+            #     requestTemplates:
+            #       application/json: '{"statusCode": 200}'
+            #     responses:
+            #       default:
+            #         statusCode: 200
+            #         responseParameters:
+            #           method.response.header.Access-Control-Allow-Origin: "'*'"
+            #           method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key'"
+            #           method.response.header.Access-Control-Allow-Methods: "'OPTIONS,POST'"
+            #         responseTemplates:
+            #           application/json: '{}'
+            #   responses:
+            #     "200":
+            #       description: "CORS preflight OK"
 
             #
             # TODO: ADD MORE ENDPOINT DEFINITIONS HERE
@@ -186,19 +290,28 @@ Resources:
             ##### It must match the URL in the "Endpoint definitions" section above.
             Path: /follow/get-followees
             Method: POST
+  
+  loadFolloweesPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt loadFollowees.Arn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${tweeterApi}/*/*/follow/get-followees
+
 
   loadFollowers:  ##### TODO: Set function name
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: loadFollowers
-      Handler: src/lambda/follow/GetFollowersLambda.handler
+      FunctionName: loadFollowers  ##### TODO: Set function name
+      Handler: src/lambda/follow/GetFollowersLambda.handler  ##### TODO: Set Handler
       Policies: *commonPolicies
       Events:
         PostApi:
           Type: Api
           Properties:
             RestApiId: !Ref tweeterApi
-            Path: /follow/get-followers
+            Path: /follow/get-followers  ##### TODO: Set Path
             Method: POST
 
   #
