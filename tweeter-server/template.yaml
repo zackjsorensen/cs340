@@ -115,12 +115,12 @@ Resources:
                 uri:
                   ##### TODO: Change "userGetFunction" to the actual function name. (Don't delete the $, {}, or .Arn suffix.)
                   ##### The function name must agree with the "Web API Lambda functions" section below.
-                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${getMoreFollowees.Arn}/invocations
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${loadFollowees.Arn}/invocations
                 requestTemplates: *commonRequestTemplates
                 responses: *commonAmazonResponses
               responses: *commonSwaggerResponses
 
-          /follow/get-followers:  ##### TODO: Set endpoint URL
+          /user/create:  ##### TODO: Set endpoint URL
             post:
               consumes: *commonConsumes
               produces: *commonProduces
@@ -129,22 +129,7 @@ Resources:
                 httpMethod: POST
                 uri:
                   ##### TODO: Set function name
-                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${getMoreFollowers.Arn}/invocations
-                requestTemplates: *commonRequestTemplates
-                responses: *commonAmazonResponses
-              responses: *commonSwaggerResponses
-
-          
-          /follow/get-is-follwer:  ##### TODO: Set endpoint URL
-            post:
-              consumes: *commonConsumes
-              produces: *commonProduces
-              x-amazon-apigateway-integration:
-                type: aws
-                httpMethod: POST
-                uri:
-                  ##### TODO: Set function name
-                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${getIsFollower.Arn}/invocations
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${userCreateFunction.Arn}/invocations
                 requestTemplates: *commonRequestTemplates
                 responses: *commonAmazonResponses
               responses: *commonSwaggerResponses
@@ -184,14 +169,13 @@ Resources:
 
   ##### TODO: Change "userGetFunction" to the actual function name.
   ##### It must match the function name in the "Endpoint definitons" section above.
-  getMoreFollowees:
+  loadFollowees:
     Type: AWS::Serverless::Function
     Properties:
       ##### TODO: Change "userGetFunction" to the actual function name.
-      FunctionName: getMoreFollowees
+      FunctionName: loadFollowees
       ##### TODO: Modify Handler property to match your code. This identifies the exact function that the lambda should run.
       Handler: src/lambda/follow/GetFolloweesLambda.handler
-      # handlers/users/UserGetHandler.userGetHandler
       Policies: *commonPolicies
       Events:
         PostApi:
@@ -200,59 +184,8 @@ Resources:
             RestApiId: !Ref tweeterApi
             ##### TODO: Modify the Path property to the actual endpoint URL.
             ##### It must match the URL in the "Endpoint definitions" section above.
-            Path: /followees
+            Path: /follow/get-followees
             Method: POST
-
-
-  GetMoreFolloweesPermission:
-    Type: AWS::Lambda::Permission
-    Properties:
-      FunctionName: !GetAtt getMoreFollowees.Arn
-      Action: lambda:InvokeFunction
-      Principal: apigateway.amazonaws.com
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${tweeterApi}/*/*/follow/get-followees
-
-
-
-  getMoreFollowers:
-    Type: AWS::Serverless::Function
-    Properties:
-      ##### TODO: Change "userGetFunction" to the actual function name.
-      FunctionName: getMoreFollowers
-      ##### TODO: Modify Handler property to match your code. This identifies the exact function that the lambda should run.
-      Handler: tweeter-server/src/lambda/follow/GetFollowersLambda.handler
-      # handlers/users/UserGetHandler.userGetHandler
-      Policies: *commonPolicies
-      Events:
-        PostApi:
-          Type: Api
-          Properties:
-            RestApiId: !Ref tweeterApi
-            ##### TODO: Modify the Path property to the actual endpoint URL.
-            ##### It must match the URL in the "Endpoint definitions" section above.
-            Path: /followers
-            Method: POST
-
-    
-
-  getIsFollower:
-    Type: AWS::Serverless::Function
-    Properties:
-      ##### TODO: Change "userGetFunction" to the actual function name.
-      FunctionName: getIsFollower
-      ##### TODO: Modify Handler property to match your code. This identifies the exact function that the lambda should run.
-      Handler: tweeter-server/src/lambda/follow/getIsFollowerStatusLambda.handler
-      Policies: *commonPolicies
-      Events:
-        PostApi:
-          Type: Api
-          Properties:
-            RestApiId: !Ref tweeterApi
-            ##### TODO: Modify the Path property to the actual endpoint URL.
-            ##### It must match the URL in the "Endpoint definitions" section above.
-            Path: /followers
-            Method: POST
-
 
   userCreateFunction:  ##### TODO: Set function name
     Type: AWS::Serverless::Function
