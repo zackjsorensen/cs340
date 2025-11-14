@@ -2,7 +2,6 @@ import { AuthToken, User, FakeData, UserDto } from "tweeter-shared";
 import { Service } from "../../../../tweeter-web/src/model.service/Service";
 
 export class Followservice implements Service{
-  // convert arrow functions to methods now that they are in a class
   public async loadMoreFollowees(
     token: string,
     userAlias: string,
@@ -40,19 +39,19 @@ export class Followservice implements Service{
   }
 
   public async getFolloweeCount(
-    authToken: AuthToken,
-    user: User
+    token: string,
+    userAlias: string
   ): Promise<number>{
     // TODO: Replace with the result of calling server
-    return FakeData.instance.getFolloweeCount(user.alias);
+    return FakeData.instance.getFolloweeCount(userAlias);
   };
 
     public async getFollowerCount(
-    authToken: AuthToken,
-    user: User
+    token: string,
+    userAlias: string
   ): Promise<number>{
     // TODO: Replace with the result of calling server
-    return FakeData.instance.getFollowerCount(user.alias);
+    return FakeData.instance.getFollowerCount(userAlias);
   };
 
 

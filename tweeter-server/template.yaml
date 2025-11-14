@@ -134,6 +134,35 @@ Resources:
                 responses: *commonAmazonResponses
               responses: *commonSwaggerResponses
 
+
+          /follow/get-followers-count:  ##### TODO: Set endpoint URL
+            post:
+              consumes: *commonConsumes
+              produces: *commonProduces
+              x-amazon-apigateway-integration:
+                type: aws
+                httpMethod: POST
+                uri:
+                  ##### TODO: Set function name
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${getFollowersCount.Arn}/invocations
+                requestTemplates: *commonRequestTemplates
+                responses: *commonAmazonResponses
+              responses: *commonSwaggerResponses
+
+          /follow/get-followees-count:  ##### TODO: Set endpoint URL
+            post:
+              consumes: *commonConsumes
+              produces: *commonProduces
+              x-amazon-apigateway-integration:
+                type: aws
+                httpMethod: POST
+                uri:
+                  ##### TODO: Set function name
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${getFolloweesCount.Arn}/invocations
+                requestTemplates: *commonRequestTemplates
+                responses: *commonAmazonResponses
+              responses: *commonSwaggerResponses
+
             #
             # TODO: ADD MORE ENDPOINT DEFINITIONS HERE
             #
@@ -199,6 +228,35 @@ Resources:
           Properties:
             RestApiId: !Ref tweeterApi
             Path: /follow/get-followers
+            Method: POST
+
+
+  getFollowersCount:  ##### TODO: Set function name
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: getFollowersCount
+      Handler: src/lambda/follow/GetFollowersCountLambda.handler
+      Policies: *commonPolicies
+      Events:
+        PostApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref tweeterApi
+            Path: /follow/get-followers-count
+            Method: POST
+
+  getFolloweesCount:  ##### TODO: Set function name
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: getFolloweesCount
+      Handler: src/lambda/follow/GetFolloweeCountLambda.handler
+      Policies: *commonPolicies
+      Events:
+        PostApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref tweeterApi
+            Path: /follow/get-followees-count
             Method: POST
 
   #
