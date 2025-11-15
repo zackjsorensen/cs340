@@ -55,11 +55,11 @@ export class Followservice implements Service{
   };
 
 
-  public async follow(authToken: AuthToken, userToFollow: User){
+  public async follow(token: string, userToFollow: string){
     return await new Promise((f) => setTimeout(f, 2000));
   }
 
-  public async unfollow(authToken: AuthToken, userToUnfollow: User){
+  public async unfollow(token: string, userToUnfollow: string){
     return await new Promise((f) => setTimeout(f, 2000));
   }
 
