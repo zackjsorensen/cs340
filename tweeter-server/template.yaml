@@ -134,7 +134,6 @@ Resources:
                 responses: *commonAmazonResponses
               responses: *commonSwaggerResponses
 
-
           /follow/get-followers-count:  ##### TODO: Set endpoint URL
             post:
               consumes: *commonConsumes
@@ -202,12 +201,58 @@ Resources:
                 responses: *commonAmazonResponses
               responses: *commonSwaggerResponses
 
-            #
-            # TODO: ADD MORE ENDPOINT DEFINITIONS HERE
-            #
+          /user/get-user:
+            post:
+              consumes: *commonConsumes
+              produces: *commonProduces
+              x-amazon-apigateway-integration:
+                type: aws
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${getUser.Arn}/invocations
+                requestTemplates: *commonRequestTemplates
+                responses: *commonAmazonResponses
+              responses: *commonSwaggerResponses
+            
+          /user/login:
+            post:
+              consumes: *commonConsumes
+              produces: *commonProduces
+              x-amazon-apigateway-integration:
+                type: aws
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${login.Arn}/invocations
+                requestTemplates: *commonRequestTemplates
+                responses: *commonAmazonResponses
+              responses: *commonSwaggerResponses
 
+          /user/register:
+            post:
+              consumes: *commonConsumes
+              produces: *commonProduces
+              x-amazon-apigateway-integration:
+                type: aws
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${register.Arn}/invocations
+                requestTemplates: *commonRequestTemplates
+                responses: *commonAmazonResponses
+              responses: *commonSwaggerResponses
 
-  #
+          /user/logout:
+            post:
+              consumes: *commonConsumes
+              produces: *commonProduces
+              x-amazon-apigateway-integration:
+                type: aws
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${logout.Arn}/invocations
+                requestTemplates: *commonRequestTemplates
+                responses: *commonAmazonResponses
+              responses: *commonSwaggerResponses
+  
   # SQS Queues  (This will become relevant in Milestone 4. For M3, leave this section commented out.)
   #
   #   MyQueue:
@@ -217,6 +262,7 @@ Resources:
   #
   # Lambda Layer (reused by all Lambda functions)
   #
+
   tweeterLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
@@ -226,11 +272,9 @@ Resources:
       CompatibleRuntimes:
         - nodejs20.x
       RetentionPolicy: DELETE
-
   #
   # Web API Lambda functions
   #
-
   ##### TODO: Change "userGetFunction" to the actual function name.
   ##### It must match the function name in the "Endpoint definitons" section above.
   loadFollowees:
@@ -334,6 +378,64 @@ Resources:
             RestApiId: !Ref tweeterApi
             Path: /follow/unfollow
             Method: POST
+
+  getUser:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: getUser
+      Handler: src/lambda/user/GetUserLambda.handler
+      Policies: *commonPolicies
+      Events:
+        PostApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref tweeterApi
+            Path: /user/get-user
+            Method: POST
+
+  login:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: login
+      Handler: src/lambda/user/LoginLambda.handler
+      Policies: *commonPolicies
+      Events:
+        PostApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref tweeterApi
+            Path: /user/login
+            Method: POST
+
+  register:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: register
+      Handler: src/lambda/user/RegisterLambda.handler
+      Policies: *commonPolicies
+      Events:
+        PostApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref tweeterApi
+            Path: /user/register
+            Method: POST
+
+  logout:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: logout
+      Handler: src/lambda/user/LogoutLambda.handler
+      Policies: *commonPolicies
+      Events:
+        PostApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref tweeterApi
+            Path: /user/logout
+            Method: POST
+
+
 
   #
   # TODO: ADD MORE WEB API LAMBDA DEFINITIONS HERE
