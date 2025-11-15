@@ -252,6 +252,45 @@ Resources:
                 requestTemplates: *commonRequestTemplates
                 responses: *commonAmazonResponses
               responses: *commonSwaggerResponses
+
+          /status/load-more-feed-items:
+            post:
+              consumes: *commonConsumes
+              produces: *commonProduces
+              x-amazon-apigateway-integration:
+                type: aws
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${loadMoreFeedItems.Arn}/invocations
+                requestTemplates: *commonRequestTemplates
+                responses: *commonAmazonResponses
+              responses: *commonSwaggerResponses
+
+          /status/load-more-story-items:
+            post:
+              consumes: *commonConsumes
+              produces: *commonProduces
+              x-amazon-apigateway-integration:
+                type: aws
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${loadMoreStoryItems.Arn}/invocations
+                requestTemplates: *commonRequestTemplates
+                responses: *commonAmazonResponses
+              responses: *commonSwaggerResponses
+
+          /status/post-status:
+            post:
+              consumes: *commonConsumes
+              produces: *commonProduces
+              x-amazon-apigateway-integration:
+                type: aws
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${postStatus.Arn}/invocations
+                requestTemplates: *commonRequestTemplates
+                responses: *commonAmazonResponses
+              responses: *commonSwaggerResponses
   
   # SQS Queues  (This will become relevant in Milestone 4. For M3, leave this section commented out.)
   #
@@ -433,6 +472,48 @@ Resources:
           Properties:
             RestApiId: !Ref tweeterApi
             Path: /user/logout
+            Method: POST
+
+  loadMoreFeedItems:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: loadMoreFeedItems
+      Handler: src/lambda/status/LoadMoreFeedItemsLambda.handler
+      Policies: *commonPolicies
+      Events:
+        PostApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref tweeterApi
+            Path: /status/load-more-feed-items
+            Method: POST
+
+  loadMoreStoryItems:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: loadMoreStoryItems
+      Handler: src/lambda/status/LoadMoreStoryItemsLambda.handler
+      Policies: *commonPolicies
+      Events:
+        PostApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref tweeterApi
+            Path: /status/load-more-story-items
+            Method: POST
+
+  postStatus:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: postStatus
+      Handler: src/lambda/status/PostStatusLambda.handler
+      Policies: *commonPolicies
+      Events:
+        PostApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref tweeterApi
+            Path: /status/post-status
             Method: POST
 
 
