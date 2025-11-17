@@ -1,4 +1,4 @@
-import { AuthTokenDto, CountRequest, LoginRequest, RegisterRequest, StartSessionResponse, UserDto } from "tweeter-shared";
+import { AuthTokenDto, LoginRequest, RegisterRequest, StartSessionResponse, UserDto } from "tweeter-shared";
 import { UserService } from "../../model/service/UserService";
 import { StartSessionLambda } from "./StartSessionLambda";
 

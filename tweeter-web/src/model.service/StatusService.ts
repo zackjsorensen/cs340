@@ -1,7 +1,7 @@
 import { AuthToken, Status, FakeData } from "tweeter-shared";
 import { Service } from "./Service";
 
-export class StatusService implements Service {
+export class StatusService extends Service {
   public async loadMoreFeedItems(
     authToken: AuthToken,
     userAlias: string,
@@ -12,15 +12,15 @@ export class StatusService implements Service {
     return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
   }
 
-  public async loadMoreStoryItems(
-    authToken: AuthToken,
-    userAlias: string,
-    pageSize: number,
-    lastItem: Status | null
-  ): Promise<[Status[], boolean]> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
-  };
+  // public async loadMoreStoryItems(
+  //   authToken: AuthToken,
+  //   userAlias: string,
+  //   pageSize: number,
+  //   lastItem: Status | null
+  // ): Promise<[Status[], boolean]> {
+  //   // TODO: Replace with the result of calling server
+  //   return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
+  // };
 
 
   // IS THIS THE RIGHT PLACE FOR THIS??????????????

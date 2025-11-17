@@ -2,13 +2,13 @@ import { Buffer } from "buffer";
 import { AuthToken, User, FakeData } from "tweeter-shared";
 import { Service } from "./Service";
 
-export class UserService implements Service{  // Service is a "marker interface"
+export class UserService extends Service{  // Service is a "marker interface"
+  
   public async getUser(
     authToken: AuthToken,
     alias: string
   ): Promise<User | null> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.findUserByAlias(alias);
+    this.serve
   }
 
   public async login(

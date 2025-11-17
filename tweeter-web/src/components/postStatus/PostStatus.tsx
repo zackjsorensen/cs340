@@ -6,12 +6,21 @@ import {
   PostStatusPresenter,
   PostStatusView,
 } from "src/presenter/PostStatusPresenter";
-import userEvent from "@testing-library/user-event";
+import { AuthToken, User } from "tweeter-shared";
 
-const PostStatus = () => {
+interface Props {
+  presenter?: PostStatusPresenter;
+}
+
+
+const PostStatus = (props: Props) => {
   const { displayInfoMessage, displayErrorMessage, deleteMessage } =
     useMessageActions();
-  const { currentUser, authToken } = useUserInfo(); // move this?????
+  const {currentUser, authToken} = useUserInfo();
+  // const { authToken:defaultAuthToken } = useUserInfo(); // There's gotta be a better way to do this..
+  // const authToken = props.authToken ? props.authToken : defaultAuthToken;
+  // const {currentUser: defualtUser} = useUserInfo();
+  // const currentUser = props.currentUser ? props.currentUser : defualtUser;
   const [post, setPost] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -23,7 +32,7 @@ const PostStatus = () => {
     setIsLoading: setIsLoading
   };
 
-  const presenterRef = new PostStatusPresenter(listener); // change later
+  const presenterRef = props.presenter ? props.presenter : new PostStatusPresenter(listener); // change later
 
   const submitPost = async (event: React.MouseEvent) => {
     event.preventDefault();
@@ -58,6 +67,7 @@ const PostStatus = () => {
           id="postStatusButton"
           className="btn btn-md btn-primary me-1"
           type="button"
+          aria-label= "postStatusButton"
           disabled={checkButtonStatus()}
           style={{ width: "8em" }}
           onClick={submitPost}
@@ -76,6 +86,7 @@ const PostStatus = () => {
           id="clearStatusButton"
           className="btn btn-md btn-secondary"
           type="button"
+          aria-label="clearStatusButton"
           disabled={checkButtonStatus()}
           onClick={clearPost}
         >

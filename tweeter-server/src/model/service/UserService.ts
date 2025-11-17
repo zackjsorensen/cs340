@@ -3,7 +3,7 @@ import { AuthToken, User, FakeData, AuthTokenDto } from "tweeter-shared";
 import { Service } from "../../../../tweeter-web/src/model.service/Service";
 import { UserDto } from "tweeter-shared";
 
-export class UserService implements Service{  // Service is a "marker interface"
+export class UserService extends Service{  // Service is a "marker interface"
   public async getUser(
     token: string,
     alias: string
