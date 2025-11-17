@@ -4,17 +4,17 @@ import { useParams } from "react-router-dom";
 import { useMessageActions } from "../toaster/MessageHooks";
 import { useUserInfo, useUserInfoActions } from "../userInfo/UserInfoHooks";
 import { PagedItemPresenter, PagedItemView } from "src/presenter/PagedItemPresenter";
-import { Service } from "src/model.service/Service";
+import { ClientService } from "src/model.service/Service";
 
 // TODO: put the navigate and j code back in the first thing....
 
-interface Props <T, U extends Service> {
+interface Props <T, U extends ClientService> {
   featureUrl: string;
-  presenterFactory: (listener: PagedItemView<T>) => PagedItemPresenter<T, Service>;
+  presenterFactory: (listener: PagedItemView<T>) => PagedItemPresenter<T, ClientService>;
   itemComponentFactory: (item: T, featurePath: string) => JSX.Element;
 }
 
-const ItemScroller = <T, U extends Service>(props: Props<T, U>) => {
+const ItemScroller = <T, U extends ClientService>(props: Props<T, U>) => {
   const { displayErrorMessage } = useMessageActions();
   const [items, setItems] = useState<T[]>([]);
   const { displayedUser, authToken } = useUserInfo();
@@ -27,7 +27,7 @@ const ItemScroller = <T, U extends Service>(props: Props<T, U>) => {
     displayErrorMessage: displayErrorMessage,
   };
 
-  const presenterRef = useRef<PagedItemPresenter<T, Service> | null>(null);
+  const presenterRef = useRef<PagedItemPresenter<T, ClientService> | null>(null);
   if (!presenterRef.current) {
     presenterRef.current = props.presenterFactory(listener);
   }

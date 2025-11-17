@@ -1,56 +1,59 @@
 import { Buffer } from "buffer";
-import { AuthToken, User, FakeData } from "tweeter-shared";
-import { Service } from "./Service";
+import {
+    AuthToken,
+    User,
+    FakeData,
+    UserInfoRequest,
+    LoginRequest,
+    RegisterRequest,
+    TweeterRequest,
+} from "tweeter-shared";
+import { ClientService } from "./Service";
 
-export class UserService extends Service{  // Service is a "marker interface"
-  
-  public async getUser(
-    authToken: AuthToken,
-    alias: string
-  ): Promise<User | null> {
-    this.serve
-  }
+export class UserService extends ClientService {
 
-  public async login(
-    alias: string,
-    password: string
-  ): Promise<[User, AuthToken]> {
-    // TODO: Replace with the result of calling the server
-    const user = FakeData.instance.firstUser;
-
-    if (user === null) {
-      throw new Error("Invalid alias or password");
+    public async getUser(authToken: AuthToken, alias: string): Promise<User | null> {
+        const req: UserInfoRequest = {
+            token: authToken.token,
+            userAlias: alias,
+        };
+        return this.server.getUser(req);
     }
 
-    return [user, FakeData.instance.authToken];
-  }
+    public async login(alias: string, password: string): Promise<[User, AuthToken]> {
+        const req: LoginRequest = {
+            alias: alias,
+            password: password,
+            token: "",
+        };
 
+        return await this.server.login(req);
+    }
 
-  public async register(
-      firstName: string,
-      lastName: string,
-      alias: string,
-      password: string,
-      userImageBytes: Uint8Array,
-      imageFileExtension: string
+    public async register(
+        firstName: string,
+        lastName: string,
+        alias: string,
+        password: string,
+        userImageBytes: Uint8Array,
+        imageFileExtension: string
     ): Promise<[User, AuthToken]> {
-      // Not neded now, but will be needed when you make the request to the server in milestone 3
-      const imageStringBase64: string =
-        Buffer.from(userImageBytes).toString("base64");
-  
-      // TODO: Replace with the result of calling the server
-      const user = FakeData.instance.firstUser;
-  
-      if (user === null) {
-        throw new Error("Invalid registration");
-      }
-  
-      return [user, FakeData.instance.authToken];
-    };
+        const req: RegisterRequest = {
+            firstName: firstName,
+            lastName: lastName,
+            alias: alias,
+            password: password,
+            userImageBytes: userImageBytes,
+            imageFileExtension: imageFileExtension,
+            token: "",
+        };
+        return await this.server.register(req);
+    }
 
-  public async logout(authToken: AuthToken){
-    // Pause so we can see the logging out message. Delete when the call to the server is implemented.
-    return await new Promise((res) => setTimeout(res, 1000));
-  }
-
+    public async logout(authToken: AuthToken) {
+        const req: TweeterRequest = {
+            token: authToken.token,
+        };
+        return await this.server.logout(req);
+    }
 }

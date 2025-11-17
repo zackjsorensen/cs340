@@ -1,36 +1,42 @@
-import { AuthToken, Status, FakeData } from "tweeter-shared";
-import { Service } from "./Service";
+import { AuthToken, Status, FakeData, PagedStatusItemRequest, PostStatusRequest } from "tweeter-shared";
+import { ClientService } from "./Service";
 
-export class StatusService extends Service {
-  public async loadMoreFeedItems(
-    authToken: AuthToken,
-    userAlias: string,
-    pageSize: number,
-    lastItem: Status | null
-  ): Promise<[Status[], boolean]> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
-  }
+export class StatusService extends ClientService {
+    public async loadMoreFeedItems(
+        authToken: AuthToken,
+        userAlias: string,
+        pageSize: number,
+        lastItem: Status | null
+    ): Promise<[Status[], boolean]> {
+        const req: PagedStatusItemRequest = {
+            token: authToken.token,
+            userAlias: userAlias,
+            pageSize: pageSize,
+            lastItem: lastItem ? lastItem.dto : null,
+        };
+        return await this.server.loadMoreFeedItems(req);
+    }
 
-  // public async loadMoreStoryItems(
-  //   authToken: AuthToken,
-  //   userAlias: string,
-  //   pageSize: number,
-  //   lastItem: Status | null
-  // ): Promise<[Status[], boolean]> {
-  //   // TODO: Replace with the result of calling server
-  //   return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
-  // };
+    public async loadMoreStoryItems(
+        authToken: AuthToken,
+        userAlias: string,
+        pageSize: number,
+        lastItem: Status | null
+    ): Promise<[Status[], boolean]> {
+        const req: PagedStatusItemRequest = {
+            token: authToken.token,
+            userAlias: userAlias,
+            pageSize: pageSize,
+            lastItem: lastItem ? lastItem.dto : null,
+        };
+        return await this.server.loadMoreStoryItems(req);
+    }
 
-
-  // IS THIS THE RIGHT PLACE FOR THIS??????????????
-  public async postStatus(
-    authToken: AuthToken,
-    newStatus: Status
-  ): Promise<void>{
-    // Pause so we can see the logging out message. Remove when connected to the server
-    await new Promise((f) => setTimeout(f, 2000));
-
-    // TODO: Call the server to post the status
-  };
+    public async postStatus(authToken: AuthToken, newStatus: Status): Promise<void> {
+        const req: PostStatusRequest = {
+            token: authToken.token,
+            newStatusDto: newStatus.dto,
+        };
+        return await this.server.postStatus(req);
+    }
 }

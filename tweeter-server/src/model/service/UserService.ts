@@ -1,9 +1,9 @@
 import { Buffer } from "buffer";
 import { AuthToken, User, FakeData, AuthTokenDto } from "tweeter-shared";
-import { Service } from "../../../../tweeter-web/src/model.service/Service";
 import { UserDto } from "tweeter-shared";
+import { ServerService } from "./ServerService";
 
-export class UserService extends Service{  // Service is a "marker interface"
+export class UserService extends ServerService{  // Service is a "marker interface"
   public async getUser(
     token: string,
     alias: string

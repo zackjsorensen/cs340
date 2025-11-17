@@ -28,19 +28,10 @@ export class ServerFacade extends ServerFacadeObject {
     communicator = new ClientCommunicator(tweeterApi);
 
     async getFollowees(
-        authToken: AuthToken,
-        userAlias: string,
-        pageSize: number,
-        lastItem: User | null
+        req: PagedUserItemRequest
     ): Promise<[User[], boolean]> {
-        let request: PagedUserItemRequest = {
-            token: authToken.token,
-            userAlias: userAlias,
-            pageSize: pageSize,
-            lastItem: lastItem,
-        };
         return this.fetchAndReport(
-            request,
+            req,
             "/follow/get-followees",
             (res: PagedUserItemResponse) => {
                 let users: User[] = [];
@@ -53,20 +44,11 @@ export class ServerFacade extends ServerFacadeObject {
     }
 
     async getFollowers(
-        authToken: AuthToken,
-        userAlias: string,
-        pageSize: number,
-        lastItem: User | null
+        req: PagedUserItemRequest
     ): Promise<[User[], boolean]> {
-        let request: PagedUserItemRequest = {
-            token: authToken.token,
-            userAlias: userAlias,
-            pageSize: pageSize,
-            lastItem: lastItem,
-        };
 
         return this.fetchAndReport(
-            request,
+            req,
             "/follow/get-followers",
             (res: PagedUserItemResponse) => {
                 let users: User[] = [];
@@ -78,51 +60,35 @@ export class ServerFacade extends ServerFacadeObject {
         );
     }
 
-    async getFollowersCount(authToken: AuthToken, user: User): Promise<number> {
-        return await this.getCount(authToken, user, "/follow/get-followers-count");
+    async getFollowersCount(req: UserInfoRequest): Promise<number> {
+        return await this.getCount(req, "/follow/get-followers-count");
     }
 
-    async getFolloweesCount(authToken: AuthToken, user: User): Promise<number> {
-        return await this.getCount(authToken, user, "/follow/get-followees-count");
+    async getFolloweesCount(req: UserInfoRequest): Promise<number> {
+        return await this.getCount(req, "/follow/get-followees-count");
     }
 
-    async getCount(authToken: AuthToken, user: User, endpoint: string): Promise<number> {
-        let request: UserInfoRequest = {
-            token: authToken.token,
-            userAlias: user.alias,
-        };
+    async getCount(req: UserInfoRequest, endpoint: string): Promise<number> {
+        
 
-        return this.fetchAndReport(request, `${endpoint}`, (res: CountResponse) => {
+        return this.fetchAndReport(req, `${endpoint}`, (res: CountResponse) => {
             return res.count;
         });
     }
 
-    async getIsFollowerStatus(
-        authToken: AuthToken,
-        user: User,
-        selectedUser: User
-    ): Promise<boolean> {
-        let request: IsFollowerRequest = {
-            token: authToken.token,
-            currentUser: user.dto,
-            selectedUser: selectedUser.dto,
-        };
-        return this.fetchAndReport(
-            request,
-            "/follow/get-is-follower-status",
+    async getIsFollowerStatus(req: IsFollowerRequest): Promise<boolean> {
+        
+        return this.fetchAndReport(req, "/follow/get-is-follower-status",
             (response: IsFollowerResponse) => {
                 return response.isFollower;
             }
         );
     }
 
-    async follow(authToken: AuthToken, userToFollow: User): Promise<void> {
-        const request: UserInfoRequest = {
-            token: authToken.token,
-            userAlias: userToFollow.alias,
-        };
+    async follow(req: UserInfoRequest): Promise<void> {
+        
         return this.fetchAndReport(
-            request,
+            req,
             "/follow/follow",
             async (response: TweeterResponse) => {
                 return;
@@ -130,13 +96,9 @@ export class ServerFacade extends ServerFacadeObject {
         );
     }
 
-    unfollow(authToken: AuthToken, userToUnfollow: User): Promise<void> {
-        const request: UserInfoRequest = {
-            token: authToken.token,
-            userAlias: userToUnfollow.alias,
-        };
+    unfollow(req: UserInfoRequest): Promise<void> {
         return this.fetchAndReport(
-            request,
+            req,
             "/follow/unfollow",
             async (response: TweeterResponse) => {
                 return;
@@ -147,12 +109,9 @@ export class ServerFacade extends ServerFacadeObject {
     async fetchAndReport<REQ extends TweeterRequest, RES extends TweeterResponse>(
         request: REQ,
         endpoint: string,
-        parseResponse: Function
+        parseResponse: (res: RES) => any
     ) {
-        const response: RES = await this.communicator.doPost(
-            request,
-            `${tweeterApi}${endpoint}`
-        );
+        const response: RES = await this.communicator.doPost<REQ, RES>(request, endpoint);
         if (response.success) {
             return parseResponse(response);
         } else {
@@ -161,21 +120,11 @@ export class ServerFacade extends ServerFacadeObject {
     }
 
     async loadMoreStatusItems(
-        authToken: AuthToken,
-        userAlias: string,
-        pageSize: number,
-        lastItem: Status | null,
+        req: PagedStatusItemRequest,
         endpoint: string
     ): Promise<[Status[], boolean]> {
-        const request: PagedStatusItemRequest = {
-            token: authToken.token,
-            userAlias: userAlias,
-            pageSize: pageSize,
-            lastItem: lastItem ? lastItem.dto : null,
-        };
-
         return await this.fetchAndReport(
-            request,
+            req,
             endpoint,
             (res: PagedStatusItemResponse) => {
                 let statuses: Status[] = [];
@@ -187,65 +136,39 @@ export class ServerFacade extends ServerFacadeObject {
         );
     }
 
-    async loadMoreFeedItems(authToken: AuthToken, userAlias: string, pageSize: number, lastItem: Status | null): Promise<[Status[], boolean]> {
-        return await this.loadMoreStatusItems(authToken, userAlias, pageSize, lastItem, "/status/load-more-feed-items");
+    async loadMoreFeedItems(req: PagedStatusItemRequest): Promise<[Status[], boolean]> {
+        return await this.loadMoreStatusItems(req, "/status/load-more-feed-items");
     }
 
-    async loadMoreStoryItems(authToken: AuthToken, userAlias: string, pageSize: number, lastItem: Status | null): Promise<[Status[], boolean]> {
-        return await this.loadMoreStatusItems(authToken, userAlias, pageSize, lastItem, "/status/load-more-story-items");
+    async loadMoreStoryItems(req: PagedStatusItemRequest): Promise<[Status[], boolean]> {
+        return await this.loadMoreStatusItems(req, "/status/load-more-story-items");
     }
 
-    async postStatus(authToken: AuthToken, newStatus: Status): Promise<void> {
-        const req: PostStatusRequest = {
-            token: authToken.token,
-            newStatusDto: newStatus.dto
-        };
-
+    async postStatus(req: PostStatusRequest): Promise<void> {
         return await this.fetchAndReport(req, "/status/post-status", (res: TweeterResponse) => {
             return res.success;
         })
     }
 
-    async getUser(authToken: AuthToken, userAlias: string): Promise<User | null> {
-        const req: UserInfoRequest = {
-            token: authToken.token,
-            userAlias: userAlias
-        };
+    async getUser(req: UserInfoRequest): Promise<User | null> {
         return this.fetchAndReport(req, "/user/get-user", (res: GetUserResponse) => {
-            return res.user? res.user : null; // >>Q<< do we need an explicit error here?
+            return res.user? User.fromDto(res.user) : null; // >>Q<< do we need an explicit error here?
         })
     }
 
-    async login(userAlias: string, password: string): Promise<[User, AuthToken]> {
-        const req: LoginRequest = {
-            alias: userAlias, 
-            password: password, 
-            token: ""
-        };
+    async login(req: LoginRequest): Promise<[User, AuthToken]> {
         return this.fetchAndReport(req, "/user/login", (res: StartSessionResponse) => {
             return [User.fromDto(res.user), AuthToken.fromDto(res.authToken)];
         });
     }
 
-    async register(firstName: string, lastName: string, userAlias: string, password: string, userImageBytes: Uint8Array, imageFileExtension: string): Promise<[User, AuthToken]> {
-        const req: RegisterRequest = {
-            firstName: firstName,
-            lastName: lastName,
-            alias: userAlias,
-            password: password,
-            userImageBytes: userImageBytes,
-            imageFileExtension: imageFileExtension,
-            token: ""
-        };
+    async register(req: RegisterRequest): Promise<[User, AuthToken]> {
         return await this.fetchAndReport(req, "/user/register", (res: StartSessionResponse) => {
             return [User.fromDto(res.user), AuthToken.fromDto(res.authToken)];
         });
     }
 
-    async logout(authToken: AuthToken): Promise<void> {
-        const req: TweeterRequest = {
-            token: authToken.token
-        };
+    async logout(req: TweeterRequest): Promise<void> {
         return await this.fetchAndReport(req, "/user/logout", (res: TweeterResponse) => {
             return res.success;
         })

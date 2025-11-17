@@ -1,56 +1,31 @@
-import { AuthToken, User, FakeData, UserDto } from "tweeter-shared";
-import { Service } from "./Service";
+import {
+    AuthToken,
+    User,
+    FakeData,
+    UserDto,
+    IsFollowerRequest,
+    UserInfoRequest,
+} from "tweeter-shared";
+import { ClientService } from "./Service";
 import { tweeterApi } from "./constants";
 import { PagedUserItemResponse } from "tweeter-shared";
 import { PagedUserItemRequest } from "tweeter-shared";
 import ItemScroller from "src/components/mainLayout/ItemScroller";
 
-export class Followservice extends Service {
-
-    protected async loadMore(
-        authToken: AuthToken,
-        userAlias: string,
-        pageSize: number,
-        lastItem: User | null,
-        apiExt: string
-    ): Promise<[User[], boolean]> {
-        const fullApiPath: string = `${tweeterApi}${apiExt}`;
-        const response = await fetch(fullApiPath, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                // "Authorization": `Bearer ${authToken.token}`,   /* is this necessary?? */
-            },
-            body: JSON.stringify({
-                token: authToken.token,
-                userAlias: userAlias,
-                pageSize: pageSize,
-                lastItem: lastItem,
-            }),
-        });
-
-        const data: PagedUserItemResponse = await response.json();
-        let users: User[] = [];
-        if (data.items) {
-            users = data.items.map((item: UserDto) => User.fromDto(item)!); // hopefully ! doesn't cause a bug...
-        }
-        return [users, data.hasMore];
-    }
-
+export class Followservice extends ClientService {
     public async loadMoreFollowees(
         authToken: AuthToken,
         userAlias: string,
         pageSize: number,
         lastItem: User | null
     ): Promise<[User[], boolean]> {
-        // TODO: Replace with the result of calling server
-        return await this.loadMore(
-            authToken,
-            userAlias,
-            pageSize,
-            lastItem,
-            "/follow/get-followees"
-        );
+        const req: PagedUserItemRequest = {
+            token: authToken.token,
+            userAlias: userAlias,
+            pageSize: pageSize,
+            lastItem: lastItem,
+        };
+        return this.server.getFollowees(req);
     }
 
     public async loadMoreFollowers(
@@ -59,8 +34,13 @@ export class Followservice extends Service {
         pageSize: number,
         lastItem: User | null
     ): Promise<[User[], boolean]> {
-        // TODO: Replace with the result of calling server
-        return await this.loadMore(authToken, userAlias, pageSize, lastItem, "/follow/get-followers")
+        const req: PagedUserItemRequest = {
+            token: authToken.token,
+            userAlias: userAlias,
+            pageSize: pageSize,
+            lastItem: lastItem,
+        };
+        return this.server.getFollowers(req);
     }
 
     public async getIsFollowerStatus(
@@ -68,25 +48,43 @@ export class Followservice extends Service {
         user: User,
         selectedUser: User
     ): Promise<boolean> {
-        // TODO: Replace with the result of calling server
-        return FakeData.instance.isFollower();
+        let req: IsFollowerRequest = {
+            token: authToken.token,
+            currentUser: user.dto,
+            selectedUser: selectedUser.dto,
+        };
+        return this.server.getIsFollowerStatus(req);
     }
 
     public async getFolloweeCount(authToken: AuthToken, user: User): Promise<number> {
-        // TODO: Replace with the result of calling server
-        return FakeData.instance.getFolloweeCount(user.alias);
+        const req: UserInfoRequest = {
+            token: authToken.token,
+            userAlias: user.alias,
+        };
+        return await this.server.getFolloweesCount(req);
     }
 
     public async getFollowerCount(authToken: AuthToken, user: User): Promise<number> {
-        // TODO: Replace with the result of calling server
-        return FakeData.instance.getFollowerCount(user.alias);
+        const req: UserInfoRequest = {
+            token: authToken.token,
+            userAlias: user.alias,
+        };
+        return await this.server.getFollowersCount(req);
     }
 
     public async follow(authToken: AuthToken, userToFollow: User) {
-        return await new Promise((f) => setTimeout(f, 2000));
+        const req: UserInfoRequest = {
+            token: authToken.token,
+            userAlias: userToFollow.alias,
+        };
+        return await this.server.follow(req);
     }
 
     public async unfollow(authToken: AuthToken, userToUnfollow: User) {
-        return await new Promise((f) => setTimeout(f, 2000));
+        const req: UserInfoRequest = {
+            token: authToken.token,
+            userAlias: userToUnfollow.alias,
+        };
+        return await this.server.unfollow(req);
     }
 }

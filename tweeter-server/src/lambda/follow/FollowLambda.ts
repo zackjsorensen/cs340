@@ -1,4 +1,4 @@
-import { CountRequest, TweeterResponse } from "tweeter-shared";
+import { UserInfoRequest, TweeterResponse } from "tweeter-shared";
 import { ChangeFollowStateLambda } from "./ChangeFollowStateLambda";
 
 export class FollowStateLambda extends ChangeFollowStateLambda{
@@ -9,7 +9,7 @@ export class FollowStateLambda extends ChangeFollowStateLambda{
 
 const handlerInstance = new FollowStateLambda();
 
-export const handler = async (request: CountRequest): Promise<TweeterResponse> => {
+export const handler = async (request: UserInfoRequest): Promise<TweeterResponse> => {
     return await handlerInstance.changeFollowState(request);
 }
 

@@ -1,4 +1,4 @@
-import { CountRequest, CountResponse, UserDto } from "tweeter-shared";
+import { UserInfoRequest, CountResponse, UserDto } from "tweeter-shared";
 import { GetCountLambda } from "./GetCountLambda";
 
 export class GetFollowersCountLambda extends GetCountLambda {
@@ -9,6 +9,6 @@ export class GetFollowersCountLambda extends GetCountLambda {
 
 const handlerInstance = new GetFollowersCountLambda();
 
-export const handler = async (request: CountRequest):Promise<CountResponse> => {
+export const handler = async (request: UserInfoRequest):Promise<CountResponse> => {
     return await handlerInstance.getCount(request.token, request.userAlias);
 }
