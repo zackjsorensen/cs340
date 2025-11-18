@@ -75,7 +75,7 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
         );
         // need to figure this out
         await this.service.follow(authToken, userToToggle);
-        await doAction(authToken, userToToggle);
+        doAction(authToken, userToToggle);
         const followerCount = await this.service.getFollowerCount(
           authToken,
           userToToggle
