@@ -25,11 +25,13 @@ import { StartSessionResponse } from "tweeter-shared";
 import { RegisterRequest } from "tweeter-shared";
 
 export class ServerFacade extends ServerFacadeObject {
-    communicator = new ClientCommunicator(tweeterApi);
+    communicator: ClientCommunicator;
+    public constructor(comm?: ClientCommunicator) {
+        super();
+        this.communicator = comm ? comm : new ClientCommunicator(tweeterApi);
+    }
 
-    async getFollowees(
-        req: PagedUserItemRequest
-    ): Promise<[User[], boolean]> {
+    async getFollowees(req: PagedUserItemRequest): Promise<[User[], boolean]> {
         return this.fetchAndReport(
             req,
             "/follow/get-followees",
@@ -43,10 +45,7 @@ export class ServerFacade extends ServerFacadeObject {
         );
     }
 
-    async getFollowers(
-        req: PagedUserItemRequest
-    ): Promise<[User[], boolean]> {
-
+    async getFollowers(req: PagedUserItemRequest): Promise<[User[], boolean]> {
         return this.fetchAndReport(
             req,
             "/follow/get-followers",
@@ -69,16 +68,15 @@ export class ServerFacade extends ServerFacadeObject {
     }
 
     async getCount(req: UserInfoRequest, endpoint: string): Promise<number> {
-        
-
         return this.fetchAndReport(req, `${endpoint}`, (res: CountResponse) => {
             return res.count;
         });
     }
 
     async getIsFollowerStatus(req: IsFollowerRequest): Promise<boolean> {
-        
-        return this.fetchAndReport(req, "/follow/get-is-follower-status",
+        return this.fetchAndReport(
+            req,
+            "/follow/get-is-follower-status",
             (response: IsFollowerResponse) => {
                 return response.isFollower;
             }
@@ -86,7 +84,6 @@ export class ServerFacade extends ServerFacadeObject {
     }
 
     async follow(req: UserInfoRequest): Promise<void> {
-        
         return this.fetchAndReport(
             req,
             "/follow/follow",
@@ -111,29 +108,29 @@ export class ServerFacade extends ServerFacadeObject {
         endpoint: string,
         parseResponse: (res: RES) => any
     ) {
-        const response: RES = await this.communicator.doPost<REQ, RES>(request, endpoint);
-        if (response.success) {
-            return parseResponse(response);
-        } else {
-            throw new Error(`Received failure from ${endpoint}`);
-        }
+
+            const response: RES = await this.communicator.doPost<REQ, RES>(request, endpoint);
+            if (response.success) {
+                return parseResponse(response);
+            } else {
+                throw new Error(`Received failure from ${endpoint}${JSON.stringify(response)}}`);
+            }
+        // } catch (error) {
+        //     throw new Error(`Failed at ${endpoint} due to error: ${error}`);
+        // }
     }
 
     async loadMoreStatusItems(
         req: PagedStatusItemRequest,
         endpoint: string
     ): Promise<[Status[], boolean]> {
-        return await this.fetchAndReport(
-            req,
-            endpoint,
-            (res: PagedStatusItemResponse) => {
-                let statuses: Status[] = [];
-                if (res.items) {
-                    statuses = res.items.map((item: StatusDto) => Status.fromDto(item)!);
-                    return [statuses, res.hasMore];
-                }
+        return await this.fetchAndReport(req, endpoint, (res: PagedStatusItemResponse) => {
+            let statuses: Status[] = [];
+            if (res.items) {
+                statuses = res.items.map((item: StatusDto) => Status.fromDto(item)!);
+                return [statuses, res.hasMore];
             }
-        );
+        });
     }
 
     async loadMoreFeedItems(req: PagedStatusItemRequest): Promise<[Status[], boolean]> {
@@ -145,15 +142,19 @@ export class ServerFacade extends ServerFacadeObject {
     }
 
     async postStatus(req: PostStatusRequest): Promise<void> {
-        return await this.fetchAndReport(req, "/status/post-status", (res: TweeterResponse) => {
-            return res.success;
-        })
+        return await this.fetchAndReport(
+            req,
+            "/status/post-status",
+            (res: TweeterResponse) => {
+                return res.success;
+            }
+        );
     }
 
     async getUser(req: UserInfoRequest): Promise<User | null> {
         return this.fetchAndReport(req, "/user/get-user", (res: GetUserResponse) => {
-            return res.user? User.fromDto(res.user) : null; // >>Q<< do we need an explicit error here?
-        })
+            return res.user ? User.fromDto(res.user) : null; // >>Q<< do we need an explicit error here?
+        });
     }
 
     async login(req: LoginRequest): Promise<[User, AuthToken]> {
@@ -163,15 +164,18 @@ export class ServerFacade extends ServerFacadeObject {
     }
 
     async register(req: RegisterRequest): Promise<[User, AuthToken]> {
-        return await this.fetchAndReport(req, "/user/register", (res: StartSessionResponse) => {
-            return [User.fromDto(res.user), AuthToken.fromDto(res.authToken)];
-        });
+        return await this.fetchAndReport(
+            req,
+            "/user/register",
+            (res: StartSessionResponse) => {
+                return [User.fromDto(res.user), AuthToken.fromDto(res.authToken)];
+            }
+        );
     }
 
     async logout(req: TweeterRequest): Promise<void> {
         return await this.fetchAndReport(req, "/user/logout", (res: TweeterResponse) => {
             return res.success;
-        })
+        });
     }
-
 }

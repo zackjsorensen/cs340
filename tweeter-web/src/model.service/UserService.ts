@@ -43,7 +43,7 @@ export class UserService extends ClientService {
             lastName: lastName,
             alias: alias,
             password: password,
-            userImageBytes: userImageBytes,
+            userImageBytes: Array.from(userImageBytes),
             imageFileExtension: imageFileExtension,
             token: "",
         };
