@@ -34,6 +34,7 @@ const UserInfo = () => {
     setIsFollower: setIsFollower,
     setFolloweeCount: setFolloweeCount,
     setFollowerCount: setFollowerCount,
+    setIsLoading: setIsLoading
   };
 
   const presenter: UserInfoPresenter = new UserInfoPresenter(view);
@@ -82,18 +83,14 @@ const UserInfo = () => {
   ): Promise<void> => {
     event.preventDefault();
 
-    setIsLoading(true);
     await presenter.follow(authToken!, displayedUser!);
-    setIsLoading(false);
   };
 
   const unfollowDisplayedUser = async (
     event: React.MouseEvent
   ): Promise<void> => {
     event.preventDefault();
-      setIsLoading(true);
       await presenter.unfollow(authToken!, displayedUser!);
-      setIsLoading(false);
   };
 
   return (
