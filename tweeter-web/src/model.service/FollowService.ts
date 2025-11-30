@@ -5,9 +5,10 @@ import {
     UserDto,
     IsFollowerRequest,
     UserInfoRequest,
+    tweeterApi
 } from "tweeter-shared";
 import { ClientService } from "./Service";
-import { tweeterApi } from "./constants";
+// import { tweeterApi } from 
 import { PagedUserItemResponse } from "tweeter-shared";
 import { PagedUserItemRequest } from "tweeter-shared";
 import ItemScroller from "src/components/mainLayout/ItemScroller";
