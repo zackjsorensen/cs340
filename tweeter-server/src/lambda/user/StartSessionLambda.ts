@@ -7,6 +7,8 @@ import { UserService } from "../../model/service/UserService";
 import { UserDto } from "tweeter-shared";
 
 export abstract class StartSessionLambda<req extends TweeterRequest> {
+/* TODO: use DAO to put new user*/
+
     userService = new UserService();
     abstract operation(request: req): Promise<[UserDto, AuthTokenDto]>;
     async handleRequest(request: req): Promise<StartSessionResponse> {
