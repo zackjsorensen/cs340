@@ -3,6 +3,6 @@ import { LoginRequest } from "./LoginRequest";
 export interface RegisterRequest extends LoginRequest{
     firstName: string,
     lastName: string,
-    userImageBytes: number[],
+    userImageBytes: Uint8Array,
     imageFileExtension: string
 }

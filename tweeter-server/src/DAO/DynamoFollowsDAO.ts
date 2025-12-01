@@ -9,7 +9,6 @@ import {
     PutCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { ParentDAO, AnyDynamoCommand } from "./ParentDAO";
-import { stringify } from "querystring";
 
 export class DynamoFollowsDAO extends ParentDAO implements FollowsDAO {
     readonly tableName = "follows";
@@ -83,30 +82,36 @@ export class DynamoFollowsDAO extends ParentDAO implements FollowsDAO {
         }
     }
 
+    async getPageOfFollowers(followeeHandle: string, pageSize: number, lastFollowerHandle: string | undefined): Promise<any> {
+        return this.getPage(followeeHandle, pageSize, lastFollowerHandle, false);
+    }
+
     async getPageOfFollowees(
         followerHandle: string,
         pageSize: number,
         lastFolloweeHandle: string | undefined
     ): Promise<any> {
-        let KeyConditionExpression = `${this.follower_handle_attr} = :pk`;
-        let ExpressionAttributeValues = lastFolloweeHandle
-            ? { ":pk": `${followerHandle}`, ":last": lastFolloweeHandle ?? 0 }
-            : { ":pk": `${followerHandle}` };
 
-        if (lastFolloweeHandle) {
-            KeyConditionExpression += `AND ${this.followee_handle_attr} > :last`;
-        }
+        return this.getPage(followerHandle, pageSize, lastFolloweeHandle, true);
+        // let KeyConditionExpression = `${this.follower_handle_attr} = :pk`;
+        // let ExpressionAttributeValues = lastFolloweeHandle
+        //     ? { ":pk": `${followerHandle}`, ":last": lastFolloweeHandle ?? 0 }
+        //     : { ":pk": `${followerHandle}` };
 
-        const params = {
-            TableName: this.tableName,
-            KeyConditionExpression: KeyConditionExpression,
-            ExpressionAttributeValues: ExpressionAttributeValues,
-            Limit: pageSize,
-        };
-        const command = new QueryCommand(params);
-        return this.doOperation(command, (result: any) => {
-            return result.Items;
-        });
+        // if (lastFolloweeHandle) {
+        //     KeyConditionExpression += `AND ${this.followee_handle_attr} > :last`;
+        // }
+
+        // const params = {
+        //     TableName: this.tableName,
+        //     KeyConditionExpression: KeyConditionExpression,
+        //     ExpressionAttributeValues: ExpressionAttributeValues,
+        //     Limit: pageSize,
+        // };
+        // const command = new QueryCommand(params);
+        // return this.doOperation(command, (result: any) => {
+        //     return result.Items;
+        // });
     }
 
     async getPage(
