@@ -12,4 +12,5 @@ export interface UserDAO{
         password: string, // TODO: Hash PWs
         imageUrl: string
     ): Promise<boolean>;
+    getPassword(userAlias: string): Promise<string>;
 }
