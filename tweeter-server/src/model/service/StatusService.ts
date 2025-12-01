@@ -1,20 +1,18 @@
 import { Status, FakeData, StatusDto, UserDto } from "tweeter-shared";
 import { ServerService } from "./ServerService";
-import { FeedDAO } from "../../DAO/FeedDAO";
+import { StatusDAO } from "../../DAO/FeedDAO";
 import { StoryDAO } from "../../DAO/StoryDAO";
 import { FollowsDAO } from "../../DAO/FollowsDAO";
 import { AuthService } from "./AuthService";
 
 export class StatusService extends ServerService {
-  feedDao: FeedDAO;
-  storyDao: StoryDAO;
+  feedDao: StatusDAO;
   followsDao: FollowsDAO;
   authService: AuthService;
 
-  constructor(feedDao: FeedDAO, storyDao: StoryDAO, followsDao: FollowsDAO, authService: AuthService){
+  constructor(feedDao: StatusDAO, storyDao: StoryDAO, followsDao: FollowsDAO, authService: AuthService){
     super();
     this.feedDao = feedDao;
-    this.storyDao = storyDao;
     this.followsDao = followsDao;
     this.authService = authService;
   }
@@ -25,7 +23,7 @@ export class StatusService extends ServerService {
     pageSize: number,
     lastItemDto: StatusDto | null
   ): Promise<[StatusDto[], boolean]> {
-    return await this.feedDao.getFeed(userAlias);
+    return await this.feedDao.getFeedPage(userAlias, pageSize, lastItemDto);
     // return this.getFakeData(lastItemDto, pageSize);
   }
 
@@ -41,7 +39,7 @@ export class StatusService extends ServerService {
     pageSize: number,
     lastItemDto: StatusDto | null
   ): Promise<[StatusDto[], boolean]> {
-    return this.storyDao.getStory(userAlias);
+    return this.feedDao.getStoriesPage(userAlias, pageSize, lastItemDto);
     // return this.getFakeData(lastItemDto, pageSize);
   };
 
@@ -52,7 +50,7 @@ export class StatusService extends ServerService {
   ): Promise<void>{
 
     const userAlias: string = await this.authService.getUserByToken(token);
-    const storySuccess = await this.storyDao.putStory(userAlias, newStatusDto);
+    const storySuccess = await this.feedDao.putStory(userAlias, newStatusDto);
     if (storySuccess == false){
       throw new Error(`Failed to add to story. User: ${userAlias}, Post: ${newStatusDto}`);
     }

@@ -1,15 +1,15 @@
 import { User, FakeData, UserDto } from "tweeter-shared";
 import { ServerService } from "./ServerService";
 import { FollowsDAO } from "../../DAO/FollowsDAO";
-import { FeedDAO } from "../../DAO/FeedDAO";
+import { StatusDAO } from "../../DAO/FeedDAO";
 import { AuthService } from "./AuthService";
 
 export class Followservice extends ServerService{
   followsDao: FollowsDAO;
-  feedDao: FeedDAO;
+  feedDao: StatusDAO;
   authService: AuthService;
 
-  constructor(followsDao: FollowsDAO, feedDao: FeedDAO, authService: AuthService){
+  constructor(followsDao: FollowsDAO, feedDao: StatusDAO, authService: AuthService){
     super();
     this.followsDao = followsDao;
     this.feedDao = feedDao;
