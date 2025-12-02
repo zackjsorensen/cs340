@@ -9,11 +9,40 @@ import {
     PutCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { ParentDAO, AnyDynamoCommand } from "./ParentDAO";
+import { QueryCommandOutput } from "@aws-sdk/client-dynamodb";
 
 export class DynamoFollowsDAO extends ParentDAO implements FollowsDAO {
     readonly tableName = "follows";
+    readonly indexName = "follows_index";
     readonly follower_handle_attr = "follower_handle";
     readonly followee_handle_attr = "followee_handle";
+
+    async getFolloweeCount(userAlias: string): Promise<number> {
+        const params = {
+            TableName: this.tableName,
+            KeyConditionExpression: "follower_handle = :u",
+            ExpressionAttributeValues: { ":u": userAlias},
+            Select: "COUNT" as const // treats it as required literal rather than string
+        };
+        const command = new QueryCommand(params);
+        return this.doOperation(command, (result: QueryCommandOutput) => {
+            return result.Count ?? 0;
+        })
+    }
+
+    async getFollowerCount(userAlias: string): Promise<number> {
+        const params = {
+            TableName: this.tableName,
+            IndexName: this.indexName,
+            KeyConditionExpression: "followee_handle = :u",
+            ExpressionAttributeValues: { ":u": userAlias},
+            Select: "COUNT" as const // treats it as required literal rather than string
+        };
+        const command = new QueryCommand(params);
+        return this.doOperation(command, (result: QueryCommandOutput) => {
+            return result.Count ?? 0;
+        });
+    }
 
     async getFollower(followeeAlias: string, followerAlias: string) {
         const params = {
@@ -73,14 +102,7 @@ export class DynamoFollowsDAO extends ParentDAO implements FollowsDAO {
         }
     }
 
-    async doOperation(command: AnyDynamoCommand, parseResult: Function) {
-        const result = await this.ddb.send(command);
-        if (result.$metadata.httpStatusCode == 200) {
-            return parseResult(result);
-        } else {
-            throw new Error(JSON.stringify(result.$metadata));
-        }
-    }
+    
 
     async getPageOfFollowers(followeeHandle: string, pageSize: number, lastFollowerHandle: string | undefined): Promise<any> {
         return this.getPage(followeeHandle, pageSize, lastFollowerHandle, false);
