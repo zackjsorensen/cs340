@@ -4,7 +4,7 @@ import { UserDto } from "tweeter-shared";
 
 
 export interface UserDAO{
-    getUser(userAlias: string): UserDto;
+    getUser(userAlias: string): Promise<UserDto>;
     putUser(
         firstName: string,
         lastName: string,
