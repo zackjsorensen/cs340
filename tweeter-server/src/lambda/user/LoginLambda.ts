@@ -4,7 +4,11 @@ import { StartSessionLambda } from "./StartSessionLambda";
 
 export class LoginLambda extends StartSessionLambda<LoginRequest> {
     async operation(request: LoginRequest): Promise<[UserDto, AuthTokenDto]> {
-        return await this.userService.login(request.alias, request.password);
+        
+        const [user, authToken] = await this.userService.login(request.alias, request.password);
+        console.log(`Authtoken passed out from the LOGIN LAMBDA: ${JSON.stringify(authToken)}`);
+        return [user, authToken];
+
     }
 }
 

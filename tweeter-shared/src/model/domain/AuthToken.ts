@@ -71,7 +71,13 @@ export class AuthToken {
     }
   }
 
-  public static fromDto(dto: AuthTokenDto): AuthToken{
-    return new AuthToken(dto.token, dto.timestamp);
+  // public static fromDto(dto: AuthTokenDto): AuthToken{
+    
+  //   return new AuthToken(dto.token, dto.timestamp);
+  // }
+  public static fromDto(dto: any): AuthToken {
+    const token = dto.token ?? dto._token;
+    const timestamp = dto.timestamp ?? dto._timestamp;
+    return new AuthToken(token, timestamp);
   }
 }

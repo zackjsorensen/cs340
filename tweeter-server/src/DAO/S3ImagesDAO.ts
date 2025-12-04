@@ -15,14 +15,17 @@ export class S3ImagesDAO extends ParentDAO implements ImageDAO{
         const params = {
             Bucket: this.bucketName,
             Key: key,
-            Body: imageBytes,
+            Body: Buffer.from(imageBytes),
             ContentType: `image/${imageFileExtension}`
         };
         const command = new PutObjectCommand(params);
-        return await this.doOperation(command, (result: PutObjectCommandOutput) => {
-             // Return a permanent URL if the bucket/object is public:
-            return `https://${this.bucketName}.s3.${this.s3.config.region}.amazonaws.com/${key}`;
-        });
+        const result = await this.s3.send(command);
+        if (result.$metadata.httpStatusCode == 200){
+            return `https://${this.bucketName}.s3.${this.s3.config.region}.amazonaws.com/${encodeURIComponent(key)}`;
+            //    https://tweeter-cs340-images.s3.us-east-2.amazonaws.com/users/%40Cosmo
+        } else {
+            throw new Error("Failed to put image");
+        }
     }
 
     async deleteImage(userAlias: string): Promise<boolean> {
@@ -32,9 +35,8 @@ export class S3ImagesDAO extends ParentDAO implements ImageDAO{
             Key: key
         };
         const command = new DeleteObjectCommand(params);
-        return await this.doOperation(command, (result: DeleteObjectCommandOutput) => {
-            return true;
-        });
+        const result = await this.s3.send(command);
+        return result.$metadata.httpStatusCode == 200 || result.$metadata.httpStatusCode == 204;
     }
 
     async updateImage(userAlias: string, newImageBytes: Uint8Array, newImageFileExtension: string): Promise<string> {

@@ -15,6 +15,7 @@ export abstract class AuthPresenter<R extends MyRequest> extends Presenter<AuthV
   public async doAuthentication(data: R) {
     this.doFailureReportingOperation(async () => {
       const [user, authToken] = await this.sumbit(data);
+      console.log(`AUTHPRESENTER received this authToken on login/register attempt: ${JSON.stringify(authToken)}`);
       this.view.authenticated(user, authToken);
       this.doNavigation(`/feed/${user.alias}`, data);
     }, this.operation_description());

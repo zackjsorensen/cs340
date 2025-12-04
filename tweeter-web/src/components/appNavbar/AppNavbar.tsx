@@ -25,6 +25,7 @@ const AppNavbar = () => {
   const presenter: NavbarPresenter = new NavbarPresenter(view);
 
   const logOut = async () => {
+    
    presenter.logout(authToken!);
   };
 

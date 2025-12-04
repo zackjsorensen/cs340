@@ -24,17 +24,21 @@ export class DynamoAuthDAO extends ParentDAO implements AuthDAO{
     }
 
     async getUserByAuthToken(token: string): Promise<[string, number]> {
+        console.log(`GetUserByAUthTOken recieved this token: ${token}`);
         const params = {
             TableName: this.tableName,
             IndexName: this.tokenIndexName,
-            KeyConditionExpression: "token = :t",
+            KeyConditionExpression: "#tok = :t",
+            ExpressionAttributeNames: { "#tok": "token" },
             ExpressionAttributeValues: {":t": token},
             Limit: 1
         };
         const command = new QueryCommand(params);
         return await this.doOperation(command, (result: QueryCommandOutput) => {
             if (result && result.Items.length >= 1){
-                return [result.Items[0].user_handle, result.Items[0].timestamp];
+                const val =  [result.Items[0].user_handle, result.Items[0].timestamp];
+                console.log(`GETUSERBYAUTH_RESULT: ${JSON.stringify(val)}\n`);
+                return val;
             } else {
                 return null; // token not found
             }
@@ -45,11 +49,9 @@ export class DynamoAuthDAO extends ParentDAO implements AuthDAO{
 
 
     async deleteAuthToken(token: string): Promise<boolean> {
-        const [userAlias, timestamp] = await this.getUserByAuthToken(token);
-        if (!userAlias || userAlias == null){
-            throw new Error(`Failed to delete token because could not find user\n`);
-        }
-        const params = {
+        try {
+            const [userAlias, timestamp] = await this.getUserByAuthToken(token);
+            const params = {
             TableName: this.tableName,
             Key: {
                 user_handle: userAlias,
@@ -60,6 +62,21 @@ export class DynamoAuthDAO extends ParentDAO implements AuthDAO{
         return await this.doOperation(command, (result: DeleteCommandOutput) => {
             return true;
         }, "Failed to delete authToken");
+        } catch (err){
+            // (!userAlias || userAlias == null){
+            throw new Error(`Failed to delete token because could not find user\n ${JSON.stringify(err)}`);
+        }
+        // const params = {
+        //     TableName: this.tableName,
+        //     Key: {
+        //         user_handle: userAlias,
+        //         timestamp: timestamp
+        //     }
+        // };
+        // const command = new DeleteCommand(params);
+        // return await this.doOperation(command, (result: DeleteCommandOutput) => {
+        //     return true;
+        // }, "Failed to delete authToken");
     }
 
     // async updateAuthToken(userAlias: string, newAuthToken: AuthToken): Promise<boolean> {

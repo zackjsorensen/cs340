@@ -6,9 +6,9 @@ import { GetCommand, PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 export class DynamoFeedDAO extends ParentDAO implements StatusDAO {
     readonly tableName = "feed";
     readonly gsiName = "stories";
-    readonly pkAttr = "feed_owner";
+    readonly pkAttr = "feed_owner_handle";
     readonly skAttr = "timestamp";
-    readonly gsiPkAttr = "status_author";
+    readonly gsiPkAttr = "author_handle";
 
     async getFeedPage(userAlias: string, pageSize: number, lastItem: StatusDto | undefined): Promise<[StatusDto[], boolean]> {
         return await this.getPageOfStatuses(this.pkAttr, userAlias, pageSize, lastItem, true);

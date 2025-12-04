@@ -113,9 +113,8 @@ export class UserService extends ServerService{  // Service is a "marker interfa
 
   public async logout(token: string){
     // deleteAuthToken
-    const alias: string = await this.authService.getUserByToken(token);
-    return await this.authService.endSession(alias);
-    return await new Promise((res) => setTimeout(res, 1000));
+    // const alias: string = await this.authService.getUserByToken(token);
+    return await this.authService.endSession(token);
   }
 
 }

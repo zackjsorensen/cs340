@@ -36,6 +36,7 @@ export class ServerFacade extends ServerFacadeObject {
             req,
             "/follow/get-followees",
             (res: PagedUserItemResponse) => {
+                console.log(`getFollowees response object: ${JSON.stringify(res)}`)
                 let users: User[] = [];
                 if (res.items) {
                     users = res.items.map((item: UserDto) => User.fromDto(item)!);
@@ -50,6 +51,8 @@ export class ServerFacade extends ServerFacadeObject {
             req,
             "/follow/get-followers",
             (res: PagedUserItemResponse) => {
+                
+                console.log(`getFollowers response object: ${JSON.stringify(res)}`)
                 let users: User[] = [];
                 if (res.items) {
                     users = res.items.map((item: UserDto) => User.fromDto(item)!);
@@ -110,6 +113,7 @@ export class ServerFacade extends ServerFacadeObject {
     ) {
 
             const response: RES = await this.communicator.doPost<REQ, RES>(request, endpoint);
+            console.log(`Response for page request: ${JSON.stringify(response)}`);
             if (response.success) {
                 return parseResponse(response);
             } else {
@@ -159,7 +163,10 @@ export class ServerFacade extends ServerFacadeObject {
 
     async login(req: LoginRequest): Promise<[User, AuthToken]> {
         return this.fetchAndReport(req, "/user/login", (res: StartSessionResponse) => {
-            return [User.fromDto(res.user), AuthToken.fromDto(res.authToken)];
+            const val =  [User.fromDto(res.user), AuthToken.fromDto(res.authToken)];
+            console.log(`SERVER_FACADE: converted from DTOs: ${JSON.stringify(val)}\nRES.AUTHTOKEN: ${JSON.stringify(res.authToken)}`);
+
+            return val;
         });
     }
 

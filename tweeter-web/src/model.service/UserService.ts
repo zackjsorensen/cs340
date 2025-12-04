@@ -51,6 +51,7 @@ export class UserService extends ClientService {
     }
 
     public async logout(authToken: AuthToken) {
+        console.log(JSON.stringify(authToken));
         const req: TweeterRequest = {
             token: authToken.token,
         };

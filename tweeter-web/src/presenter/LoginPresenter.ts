@@ -12,10 +12,12 @@ export interface LoginRequest extends MyRequest {
 export class LoginPresenter extends AuthPresenter<LoginRequest> {
 
   public async sumbit(data: LoginRequest): Promise<[User, AuthToken]> {
-      return await this.service.login(
+      const [user, authtoken] =  await this.service.login(
         data.alias,
         data.password
-      )
+      );
+      console.log(`LOGIN_PRESENTER received this authToken on login/register attempt: ${JSON.stringify(authtoken)}`);
+      return [user, authtoken];
   }
 
   protected doNavigation(url: string, data: LoginRequest): void {

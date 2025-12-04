@@ -16,6 +16,7 @@ export type {UserDto} from "./model/dto/UserDto";
 export type {AuthTokenDto} from "./model/dto/AuthTokenDto"
 export type {StatusDto} from "./model/dto/StatusDto"
 export type {PostSegmentDto} from "./model/dto/PostSegmentDto"
+export type {FollowsDto} from "./model/dto/FollowsDto";
 
 // requests
 export type {PagedUserItemRequest} from "./model/net/request/PagedUserItemRequest"

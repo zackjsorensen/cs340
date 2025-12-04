@@ -10,12 +10,15 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 import { ParentDAO, AnyDynamoCommand } from "./ParentDAO";
 import { QueryCommandOutput } from "@aws-sdk/client-dynamodb";
+import { FollowsDto, UserDto } from "tweeter-shared";
+import { DynamoUserDAO } from "./DynamoUserDAO";
 
 export class DynamoFollowsDAO extends ParentDAO implements FollowsDAO {
     readonly tableName = "follows";
     readonly indexName = "follows_index";
     readonly follower_handle_attr = "follower_handle";
     readonly followee_handle_attr = "followee_handle";
+    private userDao = new DynamoUserDAO();
 
     async getFolloweeCount(userAlias: string): Promise<number> {
         const params = {
@@ -102,9 +105,8 @@ export class DynamoFollowsDAO extends ParentDAO implements FollowsDAO {
         }
     }
 
-    
 
-    async getPageOfFollowers(followeeHandle: string, pageSize: number, lastFollowerHandle: string | undefined): Promise<any> {
+    async getPageOfFollowers(followeeHandle: string, pageSize: number, lastFollowerHandle: string | undefined): Promise<[UserDto[], boolean]> {
         return this.getPage(followeeHandle, pageSize, lastFollowerHandle, false);
     }
 
@@ -112,28 +114,8 @@ export class DynamoFollowsDAO extends ParentDAO implements FollowsDAO {
         followerHandle: string,
         pageSize: number,
         lastFolloweeHandle: string | undefined
-    ): Promise<any> {
-
+    ): Promise<[UserDto[], boolean]> {
         return this.getPage(followerHandle, pageSize, lastFolloweeHandle, true);
-        // let KeyConditionExpression = `${this.follower_handle_attr} = :pk`;
-        // let ExpressionAttributeValues = lastFolloweeHandle
-        //     ? { ":pk": `${followerHandle}`, ":last": lastFolloweeHandle ?? 0 }
-        //     : { ":pk": `${followerHandle}` };
-
-        // if (lastFolloweeHandle) {
-        //     KeyConditionExpression += `AND ${this.followee_handle_attr} > :last`;
-        // }
-
-        // const params = {
-        //     TableName: this.tableName,
-        //     KeyConditionExpression: KeyConditionExpression,
-        //     ExpressionAttributeValues: ExpressionAttributeValues,
-        //     Limit: pageSize,
-        // };
-        // const command = new QueryCommand(params);
-        // return this.doOperation(command, (result: any) => {
-        //     return result.Items;
-        // });
     }
 
     async getPage(
@@ -141,7 +123,7 @@ export class DynamoFollowsDAO extends ParentDAO implements FollowsDAO {
         pageSize: number,
         lastFolloweeHandle: string | undefined,
         getFollowees: boolean
-    ): Promise<any> {
+    ): Promise<[UserDto[], boolean]> {
         let pk: string;
         let sk: string;
         if (getFollowees == true) {
@@ -180,8 +162,35 @@ export class DynamoFollowsDAO extends ParentDAO implements FollowsDAO {
         }
 
         const command = new QueryCommand(params);
-        return this.doOperation(command, (result: any) => {
-            return result.Items;
+        return await this.doOperation(command, async (result: QueryCommandOutput) => {
+            let hasMore: boolean = false;
+            if (result.LastEvaluatedKey){
+                hasMore = true;
+            }
+            if (result.Items){
+                // const items = result.Items as unknown as FollowsDto[]; // hopefully this doesn't break things... >>Q<< 
+                const userDtos: UserDto[] = [];
+                // construct UserDtos - is there a better place for this?
+                let target;
+                if (getFollowees == true){
+                    target = this.followee_handle_attr;
+                } else {
+                    target = this.follower_handle_attr;
+                }
+
+                for (const item of result.Items){
+                    const raw = item[target];
+                    if (typeof raw !== "string") {
+                        console.error("Unexpected type for alias:", raw);
+                        continue;
+                    }
+                    const target_alias: string = item[target] as unknown as string;
+                    const singleDto: UserDto = await this.userDao.getUser(target_alias);
+                    userDtos.push(singleDto);
+                }
+                
+                return [userDtos, hasMore];
+            }
         });
     }
 }

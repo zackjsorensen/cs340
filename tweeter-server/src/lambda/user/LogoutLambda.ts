@@ -8,7 +8,7 @@ import { AuthService } from "../../model/service/AuthService";
 
 export const handler = async (request: TweeterRequest): Promise<TweeterResponse> => {
     const userService = new UserService(new S3ImagesDAO(), new DynamoUserDAO(), new AuthService(new DynamoAuthDAO(), new DynamoUserDAO()));
-        
+    console.log(`Lambda received this request: ${JSON.stringify(request)}`)
     await userService.logout(request.token);
     return{
         message: null,
