@@ -158,15 +158,27 @@ export class DynamoFollowsDAO extends ParentDAO implements FollowsDAO {
             : { ":pk": `${pkHandle}` };
 
         if (lastFolloweeHandle) {
-            KeyConditionExpression += `AND ${sk} > :last`;
+            KeyConditionExpression += ` AND ${sk} > :last`;
         }
 
-        const params = {
-            TableName: this.tableName,
-            KeyConditionExpression: KeyConditionExpression,
-            ExpressionAttributeValues: ExpressionAttributeValues,
-            Limit: pageSize,
-        };
+        let params;
+        if (getFollowees == true){
+            params = {
+                TableName: this.tableName,
+                KeyConditionExpression: KeyConditionExpression,
+                ExpressionAttributeValues: ExpressionAttributeValues,
+                Limit: pageSize,
+            };
+        } else {
+            params = {
+                TableName: this.tableName,
+                IndexName: this.indexName,
+                KeyConditionExpression: KeyConditionExpression,
+                ExpressionAttributeValues: ExpressionAttributeValues,
+                Limit: pageSize,
+            };
+        }
+
         const command = new QueryCommand(params);
         return this.doOperation(command, (result: any) => {
             return result.Items;

@@ -5,6 +5,7 @@ import { ServerService } from "./ServerService";
 import { ImageDAO } from "../../DAO/ImagesDAO";
 import { UserDAO } from "../../DAO/UserDAO";
 import { AuthService } from "./AuthService";
+import { IncorrectPasswordError, UserNotFoundError } from "../../errors/Errors";
 
 export class UserService extends ServerService{  // Service is a "marker interface"
   imageDao: ImageDAO;
@@ -23,7 +24,7 @@ export class UserService extends ServerService{  // Service is a "marker interfa
     alias: string
   ): Promise<UserDto | null> {
     // TODO: Replace with the result of calling server
-    const userDto: UserDto = await this.userDao.getUser(alias);
+    const userDto: UserDto | null = await this.userDao.getUser(alias);
 
     // let user: User | null = FakeData.instance.findUserByAlias(alias);
     // let userDto = null;
@@ -50,6 +51,10 @@ export class UserService extends ServerService{  // Service is a "marker interfa
 
     */
     const userDto: UserDto = await this.getUser("", alias);
+    if (userDto == null){
+      // bad userAlias
+      throw new UserNotFoundError(`User not found: ${alias}`);
+    }
 
 
     const authenticated = await this.authService.authenticate(alias, password);
@@ -57,7 +62,7 @@ export class UserService extends ServerService{  // Service is a "marker interfa
       const authToken: AuthToken = await this.authService.startSession(alias);
       return [userDto, authToken];
     } else {
-      throw new Error("Incorrect Username or Password");
+      throw new IncorrectPasswordError("Incorrect Password");
     }
 
 

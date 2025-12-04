@@ -64,7 +64,8 @@ export class AuthService{
     }
 
     async getUserByToken(token: string): Promise<string> {
-        return await this.authDao.getUserByAuthToken(token);
+        const [userAlias, info] = await this.authDao.getUserByAuthToken(token);
+        return userAlias;
     }
 
 

@@ -7,7 +7,7 @@ import { S3Client, PutObjectCommand, PutObjectCommandOutput, DeleteObjectCommand
 
 export class S3ImagesDAO extends ParentDAO implements ImageDAO{
     s3 = new S3Client({region: "us-east-2"});
-    bucketName: string = "user_profile_images";
+    bucketName: string = "tweeter-cs340-images";
     
     
     async putImage(userAlias: string, imageBytes: Uint8Array, imageFileExtension: string): Promise<string> {

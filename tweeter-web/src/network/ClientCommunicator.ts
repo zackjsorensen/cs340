@@ -31,7 +31,7 @@ export class ClientCommunicator {
 
     console.log(`Fetching '${url}' with params '${JSON.stringify(params)}'`);
 
-    try {
+    // try {
       const resp: Response = await fetch(url, params);
 
       if (resp.ok) {
@@ -40,16 +40,17 @@ export class ClientCommunicator {
         return response;
       } else {
         const error = await resp.json();
-        throw new Error(error.errorMessage);
+        throw new Error(error.error);
       }
-    } catch (error) {
-      console.error(error);
-      throw new Error(
-        `Client communicator ${params.method} failed:\n${
-          (error as Error).message
-        }`
-      );
-    }
+    // } 
+    // catch (error) {
+    //   console.error(error);
+    //   throw new Error(
+    //     `Client communicator ${params.method} failed:\n${
+    //       (error as Error).message
+    //     }`
+    //   );
+    // }
   }
 
   private getUrl(endpoint: string): string {

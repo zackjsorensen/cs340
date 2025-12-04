@@ -1,4 +1,4 @@
-import { tweeterApi } from "src/model.service/constants";
+import { tweeterApi } from "tweeter-shared";
 import { ClientCommunicator } from "./ClientCommunicator";
 import { ServerFacadeObject } from "./ServerFacadeInterface";
 import {

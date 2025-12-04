@@ -21,6 +21,29 @@ export class RegisterPresenter extends AuthPresenter<RegisterRequest> {
   }
 
   public async processImageFile(file: File | undefined): Promise<Uint8Array> {
+    
+    return new Promise((resolve, reject) => {
+    if (!file) {
+      reject(new Error("No file provided"));
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event: ProgressEvent<FileReader>) => {
+      try {
+        const imageStringBase64 = event.target?.result as string;
+        const imageStringBase64BufferContents = imageStringBase64.split("base64,")[1];
+        const bytes: Uint8Array = Buffer.from(imageStringBase64BufferContents, "base64");
+        resolve(bytes); // ✅ resolve the promise with the bytes
+      } catch (err) {
+        reject(err);
+      }
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+
+    
     const reader = new FileReader();
     reader.onload = (event: ProgressEvent<FileReader>) => {
       const imageStringBase64 = event.target?.result as string;

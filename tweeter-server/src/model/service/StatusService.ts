@@ -10,7 +10,7 @@ export class StatusService extends ServerService {
   followsDao: FollowsDAO;
   authService: AuthService;
 
-  constructor(feedDao: StatusDAO, storyDao: StoryDAO, followsDao: FollowsDAO, authService: AuthService){
+  constructor(feedDao: StatusDAO, followsDao: FollowsDAO, authService: AuthService){
     super();
     this.feedDao = feedDao;
     this.followsDao = followsDao;

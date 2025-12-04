@@ -1,7 +1,7 @@
 import { UserDto } from "tweeter-shared";
 import { ParentDAO } from "./ParentDAO";
 import { UserDAO } from "./UserDAO";
-import { GetCommand, GetCommandOutput, PutCommand, PutCommandOutput, QueryCommand } from "@aws-sdk/lib-dynamodb";
+import { BatchWriteCommand, GetCommand, GetCommandOutput, PutCommand, PutCommandOutput, QueryCommand } from "@aws-sdk/lib-dynamodb";
 
 
 export class DynamoUserDAO extends ParentDAO implements UserDAO{
@@ -41,7 +41,8 @@ export class DynamoUserDAO extends ParentDAO implements UserDAO{
                 };
                 return userDto;
             } else {
-                throw new Error(`Could not retrieve user info. Metadata: ${JSON.stringify(result.$metadata)}`);
+                const empty: UserDto = null;
+                return empty;
             }
         })
     }
@@ -60,6 +61,24 @@ export class DynamoUserDAO extends ParentDAO implements UserDAO{
                 throw new Error("Unable to retrieve password");
             }
         })
+    }
+
+    async putBatchOfUsers(items: UserDto[]): Promise<boolean>{
+        const params = {
+            RequestItems: {
+                [this.tableName]: items.map((item: UserDto) => ({
+                    PutRequest: {Item: {
+                        user_handle: item.alias,
+                        first_name: item.firstName,
+                        last_name: item.lastName, 
+                        password: "gocougs",
+                        image_url: item.imageUrl
+                    }}
+                }))
+            }
+        };
+        const command = new BatchWriteCommand(params);
+        return await this.doOperation(command, () => {return true;});
     }
 
 }

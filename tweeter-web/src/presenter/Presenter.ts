@@ -24,9 +24,9 @@ export abstract class Presenter<v extends View> {
   ) {
     try {
       await operation();
-    } catch (error) {
+    } catch (error: any) {
       this._view.displayErrorMessage(
-        `Failed to ${operationDescription} because of exception: ${error}`
+        `${error.message}`
       );
     }
   }
