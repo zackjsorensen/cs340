@@ -7,6 +7,7 @@ import {
     DeleteCommand,
     QueryCommand,
     PutCommand,
+    QueryCommandInput,
 } from "@aws-sdk/lib-dynamodb";
 import { ParentDAO, AnyDynamoCommand } from "./ParentDAO";
 import { QueryCommandOutput } from "@aws-sdk/client-dynamodb";
@@ -126,24 +127,28 @@ export class DynamoFollowsDAO extends ParentDAO implements FollowsDAO {
     ): Promise<[UserDto[], boolean]> {
         let pk: string;
         let sk: string;
+        let startKey;
         if (getFollowees == true) {
             pk = this.follower_handle_attr;
             sk = this.followee_handle_attr;
+            startKey = {
+                follower_handle: pkHandle,
+                followee_handle: lastFolloweeHandle
+            };
         } else {
             pk = this.followee_handle_attr;
             sk = this.follower_handle_attr;
+            startKey = {
+                followee_handle: pkHandle,
+                follower_handle: lastFolloweeHandle
+            }
         }
 
         let KeyConditionExpression = `${pk} = :pk`;
-        let ExpressionAttributeValues = lastFolloweeHandle
-            ? { ":pk": `${pkHandle}`, ":last": lastFolloweeHandle ?? 0 }
-            : { ":pk": `${pkHandle}` };
+        let ExpressionAttributeValues = { ":pk": `${pkHandle}` };
+        
 
-        if (lastFolloweeHandle) {
-            KeyConditionExpression += ` AND ${sk} > :last`;
-        }
-
-        let params;
+        let params: QueryCommandInput;
         if (getFollowees == true){
             params = {
                 TableName: this.tableName,
@@ -160,6 +165,11 @@ export class DynamoFollowsDAO extends ParentDAO implements FollowsDAO {
                 Limit: pageSize,
             };
         }
+        console.log(`START KEY: ${JSON.stringify(startKey)}`);
+        if (lastFolloweeHandle) {
+            params.ExclusiveStartKey = startKey;
+        }
+
 
         const command = new QueryCommand(params);
         return await this.doOperation(command, async (result: QueryCommandOutput) => {

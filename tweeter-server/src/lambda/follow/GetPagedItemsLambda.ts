@@ -17,6 +17,7 @@ export abstract class GetPagedItemsLambda {
     ): Promise<[UserDto[], boolean]>;
 
     async loadMoreItems(request: PagedUserItemRequest): Promise<PagedUserItemResponse> {
+        console.log(`GET_PAGED_ITEM_LAMBDA recieved this value for lastItem: ${JSON.stringify(request.lastItem)}\n`);
         const [items, hasMore] = await this.loadMore(
             request.token,
             request.userAlias,

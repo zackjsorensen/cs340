@@ -133,4 +133,23 @@ async function testUsers(){
     console.log(await usersDao.getUser("@Utah_butt_kicker"));
 }
 
-testUsers();
+async function populateFollowers(){
+    const followsDAO = new DynamoFollowsDAO();
+
+    console.log("Testing");
+
+    console.log(await followsDAO.addFollower("@zay", "@Cosmo"));
+    console.log(await followsDAO.addFollower("@Bear", "@Cosmo"));
+    console.log(await followsDAO.addFollower("@Cosmo", "@CHagen"));
+    console.log(await followsDAO.addFollower("@Cosmo", "@JK_get_sacked"));
+    console.log(await followsDAO.addFollower("@Cosmo", "@CRyan"));
+    console.log(await followsDAO.addFollower("@Cosmo", "@the_Great_Wall"));
+    console.log(await followsDAO.addFollower("@Cosmo", "@Super_Satu"));
+    console.log(await followsDAO.addFollower("@Cosmo", "@EJ"));
+    console.log(await followsDAO.addFollower("@Cosmo", "@Coach_Kilani"));
+    console.log(await followsDAO.addFollower("@Cosmo", "@cant_chase_me"));
+    console.log(await followsDAO.addFollower("@Cosmo", "@speed_King"));
+
+}
+
+populateFollowers();

@@ -28,7 +28,7 @@ export class Followservice extends ServerService{
     } else {
       lastHandle = lastItem.alias;
     }
-
+  
     return await this.followsDao.getPageOfFollowees(userAlias, pageSize, lastHandle);
     // return this.getFakeData(lastItem, pageSize, userAlias);
   }
@@ -37,15 +37,16 @@ export class Followservice extends ServerService{
     token: string,
     userAlias: string,
     pageSize: number,
-    lastItem: UserDto | null
+    lastItem: any
   ): Promise<[UserDto[], boolean]> {
 
     let lastHandle: string | undefined;
     if (lastItem == null){
       lastHandle = undefined;
     } else {
-      lastHandle = lastItem.alias;
+      lastHandle = lastItem.alias ?? lastItem._alias;
     }
+      console.log(`LOAD_MORE_FOLLOWERS in FollowService recieved ${JSON.stringify(lastItem)} and sent ${lastHandle}\n`);
     return await this.followsDao.getPageOfFollowers(userAlias, pageSize, lastHandle);
     // return this.getFakeData(lastItem, pageSize, userAlias);
   }
