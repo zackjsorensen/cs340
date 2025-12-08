@@ -3,12 +3,14 @@ import { LoadMoreItemsLambda } from "./LoadMoreItemsLambda";
 
 export class LoadMoreStoryItemsLambda extends LoadMoreItemsLambda{
     async operation(request: PagedStatusItemRequest): Promise<[StatusDto[] | null, boolean]> {
-        return await this.statusService.loadMoreStoryItems(
+        const [storyItems, hasMore] =  await this.statusService.loadMoreStoryItems(
             request.token,
             request.userAlias,
             request.pageSize,
             request.lastItem
-        )
+        );
+        console.log(`LoadMoreStoryItemsLAMBDA: got and forwarded this first post: ${JSON.stringify(storyItems[0])}`);
+        return [storyItems, hasMore];
     }
 }
 

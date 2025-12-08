@@ -43,7 +43,15 @@ export class DynamoFeedDAO extends ParentDAO implements StatusDAO {
         
     async getStoriesPage(userAlias: string, pageSize: number, lastItem: StatusDto | undefined): Promise<[StatusDto[], boolean]> {
         // just need to query the index
-        return await this.getPageOfStatuses(this.gsiPkAttr, userAlias, pageSize, lastItem, false);
+        // temp log
+        const [vals, hasMore] = await this.getPageOfStatuses(this.gsiPkAttr, userAlias, pageSize, lastItem, false);
+        for (let val in vals){
+            console.log(`DYNAMO_FEED_DAO recieved this first story: ${JSON.stringify(val)}`);
+            break;
+        }
+        return [vals, hasMore];
+        // return await this.getPageOfStatuses(this.gsiPkAttr, userAlias, pageSize, lastItem, false);
+
     }
 
 
@@ -98,7 +106,8 @@ export class DynamoFeedDAO extends ParentDAO implements StatusDAO {
                 timestamp: statusDto.timestamp,
                 author_handle: authorAlias,
                 authorDto: statusDto.userDto,
-                segments: statusDto.segments
+                segments: statusDto.segments,
+                post: statusDto.post
             },
         };
         

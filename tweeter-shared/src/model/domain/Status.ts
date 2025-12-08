@@ -109,6 +109,7 @@ export class Status {
     const urls: string[] = [];
 
     for (let word of post.split(/(\s+)/)) {
+      console.log(`STATUS.TS: recieved following post: ${JSON.stringify(post)}`)
       if (word.startsWith("http://") || word.startsWith("https://")) {
         const endIndex = Status.findUrlEndIndex(word);
         urls.push(word.substring(0, endIndex));

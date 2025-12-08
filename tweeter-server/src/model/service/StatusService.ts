@@ -56,16 +56,17 @@ export class StatusService extends ServerService {
     }
 
     const numFollowers:number = await this.followsDao.getFollowerCount(userAlias);
-    let [allFollowers, hasMore] = await this.followsDao.getPageOfFollowers(userAlias, numFollowers, undefined);
-    if (allFollowers){
-      for (const follower of allFollowers) {
-        const success = await this.feedDao.putPost(userAlias, newStatusDto, follower.alias);
-        if (success == false){
-          throw new Error(`Failed to send post to follower ${follower}`);
+    if (numFollowers > 0){
+      let [allFollowers, hasMore] = await this.followsDao.getPageOfFollowers(userAlias, numFollowers, undefined);
+      if (allFollowers){
+        for (const follower of allFollowers) {
+          const success = await this.feedDao.putPost(userAlias, newStatusDto, follower.alias);
+          if (success == false){
+            throw new Error(`Failed to send post to follower ${follower}`);
+          }
         }
       }
     }
-   
     
     // for every follower in followers, this.feedDao.put();
     // this.storyDto.put(status)

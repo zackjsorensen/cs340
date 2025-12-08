@@ -108,6 +108,7 @@ export class DynamoFollowsDAO extends ParentDAO implements FollowsDAO {
 
 
     async getPageOfFollowers(followeeHandle: string, pageSize: number, lastFollowerHandle: string | undefined): Promise<[UserDto[], boolean]> {
+        console.log(`GET_PAGE_OF_FOLLOWERS in DynamoFollowersDAO was passed this ARGUMENT for lastFollowerHandle: ${lastFollowerHandle}\n`);
         return this.getPage(followeeHandle, pageSize, lastFollowerHandle, false);
     }
 
@@ -125,6 +126,7 @@ export class DynamoFollowsDAO extends ParentDAO implements FollowsDAO {
         lastFolloweeHandle: string | undefined,
         getFollowees: boolean
     ): Promise<[UserDto[], boolean]> {
+        console.log(`GET_PAGE in DynamoFollwsDAO was passed this value for lastFolloweeHandle: ${lastFolloweeHandle}\n`);
         let pk: string;
         let sk: string;
         let startKey;
@@ -154,7 +156,7 @@ export class DynamoFollowsDAO extends ParentDAO implements FollowsDAO {
                 TableName: this.tableName,
                 KeyConditionExpression: KeyConditionExpression,
                 ExpressionAttributeValues: ExpressionAttributeValues,
-                Limit: pageSize,
+                Limit: pageSize
             };
         } else {
             params = {
@@ -162,7 +164,7 @@ export class DynamoFollowsDAO extends ParentDAO implements FollowsDAO {
                 IndexName: this.indexName,
                 KeyConditionExpression: KeyConditionExpression,
                 ExpressionAttributeValues: ExpressionAttributeValues,
-                Limit: pageSize,
+                Limit: pageSize
             };
         }
         console.log(`START KEY: ${JSON.stringify(startKey)}`);
@@ -204,3 +206,10 @@ export class DynamoFollowsDAO extends ParentDAO implements FollowsDAO {
         });
     }
 }
+
+/* 
+
+We get an error when we try to fan the story out to followers, bc 
+LIMIT has to be >0, and if we have a user with no followers, we set LIMIT = 0
+
+*/
