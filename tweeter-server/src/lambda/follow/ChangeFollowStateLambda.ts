@@ -8,10 +8,10 @@ import { DynamoUserDAO } from "../../DAO/DynamoUserDAO";
 
 export abstract class ChangeFollowStateLambda{
     followService = new Followservice(new DynamoFollowsDAO(), new DynamoFeedDAO, new AuthService( new DynamoAuthDAO(), new DynamoUserDAO));
-    abstract operation(token: string, userAlias: string): void;
+    abstract operation(token: string, userAlias: string): Promise<void>;
 
     public async changeFollowState(request: UserInfoRequest): Promise<TweeterResponse>{
-        this.operation(request.token, request.userAlias);
+        await this.operation(request.token, request.userAlias);
         return {
             success: true,
             message: null

@@ -58,8 +58,11 @@ export class DynamoFollowsDAO extends ParentDAO implements FollowsDAO {
         };
         const command = new GetCommand(params);
         const result = await this.ddb.send(command);
-        // console.log(result);
-        return true;
+        if (result.Item){
+            return true;
+        } else{
+            return false;
+        }
     }
 
     async removeFollower(followeeAlias: string, followerAlias: string): Promise<boolean> {
@@ -83,16 +86,35 @@ export class DynamoFollowsDAO extends ParentDAO implements FollowsDAO {
         }
     }
 
+
+     async putBatchOfFollowers(items: FollowsDto[]): Promise<boolean>{
+        const params = {
+            RequestItems: {
+                [this.tableName]: items.map((item: FollowsDto) => ({
+                    PutRequest: {Item: {
+                        follower_handle: item.follower_handle,   // bandaid fix: Change later
+                        followee_handle: item.followee_handle
+                    }}
+                }))
+            }
+        };
+        const command = new BatchWriteCommand(params);
+        return await this.doOperation(command, () => {return true;});
+    }
+
+
+
     async addFollower(followeeAlias: string, followerAlias: string): Promise<boolean> {
         const params = {
             TableName: this.tableName,
-            Item: {
-                follower_handle: followerAlias,
-                followee_handle: followeeAlias,
+            Item: { // bandaid fix: change later
+                follower_handle: followeeAlias,
+                followee_handle: followerAlias,
             },
         };
 
         const command = new PutCommand(params);
+        console.log(`DynamoFollowsDAO: follow request: ${followeeAlias} <-- ${followerAlias}\n\n`);
 
         return this.doOperation(command, () => {
             return true;

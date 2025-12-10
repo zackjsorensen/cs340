@@ -3,6 +3,7 @@ import { DynamoFollowsDAO } from "./DynamoFollowsDAO";
 import {DynamoFeedDAO} from "./DynamoFeedDAO";
 import { UserDto } from "tweeter-shared";
 import { DynamoUserDAO } from "./DynamoUserDAO";
+import { FollowsDto } from "tweeter-shared";
 
 async function main(){
     const followsDao = new DynamoFollowsDAO();
@@ -29,8 +30,6 @@ async function testFeed(){
 }
 
 
-
-
 const zay: UserDto = {
     firstName: "Isaiah",
     lastName: "Glasker",
@@ -38,92 +37,7 @@ const zay: UserDto = {
     imageUrl: "https://tweeter-cs340-images.s3.us-east-2.amazonaws.com/tweeter-byu/Zay.jpg"
 };
 
-const bear: UserDto = {
-    firstName: "Bear",
-    lastName: "Bachmeier",
-    alias: "@Bear",
-    imageUrl: "https://tweeter-cs340-images.s3.us-east-2.amazonaws.com/tweeter-byu/Bear.jpeg"
-};
 
-const cody: UserDto = {
-    firstName: "Cody",
-    lastName: "Hagen",
-    alias: "@CHagen",
-    imageUrl: "https://tweeter-cs340-images.s3.us-east-2.amazonaws.com/tweeter-byu/Cody.jpeg"
-};
-
-const carson: UserDto = {
-    firstName: "Carson",
-    lastName: "Ryan",
-    alias: "@CRyan",
-    imageUrl: "https://tweeter-cs340-images.s3.us-east-2.amazonaws.com/tweeter-byu/Carson.jpeg"
-};
-
-const chase: UserDto = {
-    firstName: "Chase",
-    lastName: "Roberts",
-    alias: "@cant_chase_me",
-    imageUrl: "https://tweeter-cs340-images.s3.us-east-2.amazonaws.com/tweeter-byu/Chase.jpeg"
-};
-
-const evan: UserDto = {
-    firstName: "Evan",
-    lastName: "Johnson",
-    alias: "@EJ",
-    imageUrl: "https://tweeter-cs340-images.s3.us-east-2.amazonaws.com/tweeter-byu/Evan.jpeg"
-};
-
-const jack: UserDto = {
-    firstName: "Jack",
-    lastName: "Kelly",
-    alias: "@JK_get_sacked",
-    imageUrl: "https://tweeter-cs340-images.s3.us-east-2.amazonaws.com/tweeter-byu/Jack.jpeg"
-};
-
-const kalani: UserDto = {
-    firstName: "Kalani",
-    lastName: "Sitake",
-    alias: "@Coach_Kilani",
-    imageUrl: "https://tweeter-cs340-images.s3.us-east-2.amazonaws.com/tweeter-byu/Kalani.jpeg"
-};
-
-const kingston: UserDto = {
-    firstName: "Parker",
-    lastName: "Kingston",
-    alias: "@speed_King",
-    imageUrl: "https://tweeter-cs340-images.s3.us-east-2.amazonaws.com/tweeter-byu/Kingston.jpeg"
-};
-
-const lj: UserDto = {
-    firstName: "LJ",
-    lastName: "Martin",
-    alias: "@BYU_Bruiser",
-    imageUrl: "https://tweeter-cs340-images.s3.us-east-2.amazonaws.com/tweeter-byu/LJ.jpeg"
-};
-
-const satuala: UserDto = {
-    firstName: "Faletau",
-    lastName: "Satuala",
-    alias: "@Super_Satu",
-    imageUrl: "https://tweeter-cs340-images.s3.us-east-2.amazonaws.com/tweeter-byu/satuala.jpeg"
-};
-
-const wall: UserDto = {
-    firstName: "Tanner",
-    lastName: "Wall",
-    alias: "@the_Great_Wall",
-    imageUrl: "https://tweeter-cs340-images.s3.us-east-2.amazonaws.com/tweeter-byu/Wall.jpeg"
-};
-
-const will: UserDto = {
-    firstName: "Will",
-    lastName: "Ferrin",
-    alias: "@Utah_butt_kicker",
-    imageUrl: "https://tweeter-cs340-images.s3.us-east-2.amazonaws.com/tweeter-byu/Will.jpeg"
-    //         https://tweeter-cs340-images.s3.us-east-2.amazonaws.com/tweeter-byu/Will.jpeg
-};
-
-const cougs = [zay, bear, cody, carson, chase, evan, jack, kalani, kingston, lj, satuala, wall, will];
 
 async function testUsers(){
     const usersDao = new DynamoUserDAO();
@@ -152,4 +66,35 @@ async function populateFollowers(){
 
 }
 
-populateFollowers();
+async function createUsers(userAliasBase: string, userToFollow: string){ // create test users and make them all follow Cosmo
+    const userDAO = new DynamoUserDAO();
+    const followDAO = new DynamoFollowsDAO();
+
+    let userDtos: UserDto[] = [];
+    let followsDtos: FollowsDto[] = [];
+
+    for (let i = 10070; i < 10200; i++){
+        let nextUser: UserDto = {
+            firstName: `${userAliasBase}_${i}`,
+            lastName: `${i}`,
+            alias: `@${userAliasBase}_fan_${i}`,
+            imageUrl: "https://tweeter-cs340-images.s3.us-east-2.amazonaws.com/users/%40test"
+        };
+        userDtos.push(nextUser);
+
+        let nextFollow: FollowsDto = {
+            follower_handle: `@${userAliasBase}_fan_${i}`,
+            followee_handle: `${userToFollow}`
+        };
+        followsDtos.push(nextFollow);
+
+        if (userDtos.length == 25 ){
+            await userDAO.putBatchOfUsers(userDtos);
+            userDtos = [];
+            await followDAO.putBatchOfFollowers(followsDtos);
+            followsDtos = [];
+        }
+    }
+}
+
+createUsers("byu_bb", "@RW3");

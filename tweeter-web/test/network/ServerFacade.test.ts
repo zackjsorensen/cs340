@@ -1,41 +1,42 @@
-// import { anyNumber, anyString, anything, capture, instance, mock, spy, verify, when,} from "@typestrong/ts-mockito";
-// import { tweeterApi } from "src/model.service/constants";
-// import { ClientCommunicator } from "src/network/ClientCommunicator";
-// import { ServerFacade } from "src/network/ServerFacade";
-// import { RegisterRequest } from "tweeter-shared";
-// import { AuthToken, Status, User } from "tweeter-shared";
-// import "isomorphic-fetch"
-// import { PagedUserItemRequest } from "tweeter-shared";
-// import { UserInfoRequest } from "tweeter-shared";
+import { anyNumber, anyString, anything, capture, instance, mock, spy, verify, when,} from "@typestrong/ts-mockito";
+import { ClientCommunicator } from "src/network/ClientCommunicator";
+import { ServerFacade } from "src/network/ServerFacade";
+import { LoginRequest, RegisterRequest, tweeterApi } from "tweeter-shared";
+import { AuthToken, Status, User } from "tweeter-shared";
+import "isomorphic-fetch"
+import { PagedUserItemRequest } from "tweeter-shared";
+import { UserInfoRequest } from "tweeter-shared";
+import { PostStatusPresenter } from "src/presenter/PostStatusPresenter";
 
-// describe("ServerFacade", () => {
-//     let communicatorSpy: ClientCommunicator;
-//     let serverFacade: ServerFacade;
+describe("ServerFacade", () => {
+    let communicatorSpy: ClientCommunicator;
+    let serverFacade: ServerFacade;
 
-//     beforeEach(async () => {
-//         // communicatorSpy = spy (new ClientCommunicator(tweeterApi));
-//         // serverFacade = new ServerFacade(instance(communicatorSpy));
-//         communicatorSpy = new ClientCommunicator(tweeterApi);
-//         serverFacade = new ServerFacade();
-//     })
+    beforeEach(async () => {
+        // communicatorSpy = spy (new ClientCommunicator(tweeterApi));
+        // serverFacade = new ServerFacade(instance(communicatorSpy));
+        communicatorSpy = new ClientCommunicator(tweeterApi);
+        serverFacade = new ServerFacade();
+        // postPresenterSpy = spy (new PostStatusPresenter())
+    })
 
 
-//     it("calls the register endpoint and returns the result", async() => {
-//         const req: RegisterRequest = {
-//             firstName: "Lebron",
-//             lastName: "James",
-//             userImageBytes: Array.from(new Uint8Array([1, 2, 3, 4])),
-//             imageFileExtension: ".ext",
-//             alias: "LBJ23",
-//             password: "asdfasdfasdf",
-//             token: ""
-//         }
-//         const [user, authToken] = await serverFacade.register(req);
-//         // verify(communicatorSpy.doPost(req, "/user/register")).once();
-//         expect(user).toBeInstanceOf(User);
-//         expect(authToken).toBeInstanceOf(AuthToken);
-//         expect(user.alias).toBeDefined();
-//     }),
+    it("calls the login endpoint and returns the result", async() => {
+        const req: LoginRequest = {
+            alias: "@Cosmo",
+            password: "gocougs",
+            token: ""
+        }
+        const [user, authToken] = await serverFacade.login(req);
+        // verify(communicatorSpy.doPost(req, "/user/register")).once();
+        expect(user).toBeInstanceOf(User);
+        expect(authToken).toBeInstanceOf(AuthToken);
+        expect(user.alias).toBeDefined();
+
+        // call PostStatus on the presenter
+
+    })
+});
 
 //     it("Gets more Followers from the server", async () => {
 //         const req: PagedUserItemRequest = {

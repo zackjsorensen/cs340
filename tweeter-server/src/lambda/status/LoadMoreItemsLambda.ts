@@ -5,10 +5,11 @@ import { DynamoFeedDAO } from "../../DAO/DynamoFeedDAO";
 import { DynamoFollowsDAO } from "../../DAO/DynamoFollowsDAO";
 import { DynamoUserDAO } from "../../DAO/DynamoUserDAO";
 import { AuthService } from "../../model/service/AuthService";
+import { SqsDAO } from "../../DAO/SqsDAO";
 
 
 export abstract class LoadMoreItemsLambda{
-    statusService = new StatusService(new DynamoFeedDAO(), new DynamoFollowsDAO(), new AuthService(new DynamoAuthDAO, new DynamoUserDAO));
+    statusService = new StatusService(new DynamoFeedDAO(), new DynamoFollowsDAO(), new AuthService(new DynamoAuthDAO(), new DynamoUserDAO()), new SqsDAO());
         
 
     abstract operation(request: PagedStatusItemRequest): Promise<[StatusDto[] | null, boolean]>;

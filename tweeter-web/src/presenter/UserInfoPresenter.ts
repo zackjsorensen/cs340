@@ -27,6 +27,9 @@ export class UserInfoPresenter extends Presenter<UserInfoView> {
                     await this.service.getIsFollowerStatus(authToken!, user!, selectedUser!)
                 );
             }
+
+            console.log(`UserInfoPresenter: ${user.alias}, ${selectedUser.alias} -> ${await this.service.getIsFollowerStatus(authToken!, user!, selectedUser!)}
+            authtoken: ${authToken}`);
             this.view.setIsLoading(false);
         }, "determine follower status");
     }

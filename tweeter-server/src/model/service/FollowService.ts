@@ -85,8 +85,10 @@ export class Followservice extends ServerService{
 
   public follow = async (token: string, userToFollow: string) => {
     const loggedInUserAlias: string = await this.authService.getUserByToken(token);
-    return await this.followsDao.addFollower(loggedInUserAlias, userToFollow);
-    return await new Promise((f) => setTimeout(f, 2000));
+    console.log(`Attempting to make ${loggedInUserAlias} follow ${userToFollow}\n`);
+    const res = await this.followsDao.addFollower(loggedInUserAlias, userToFollow);
+    console.log(`Result of attempting to follow ${userToFollow}: ${res}`);
+    return res;
   }
 
   public unfollow = async (token: string, userToUnfollow: string) => {
